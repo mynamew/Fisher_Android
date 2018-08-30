@@ -42,4 +42,11 @@
         <item name="android:inputType">text</item>
         <item name="android:imeOptions">actionNext</item>
     </style>
+    <!--Dialog的样式-->
+    <style name="Dialog" parent="android:style/Theme.Dialog">
+        <item name="android:background">#002a2a2a</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
 </resources>

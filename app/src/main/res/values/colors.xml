@@ -10,4 +10,6 @@
     <color name="colorRed">#FF0000</color>
     <color name="colorGray">#999999</color>
     <color name="colorEFEFEF">#EFEFEF</color>
+    <color name="login_txt_color">#ffb700</color>
+    <color name="login_txt_color_gray">#bf8a02</color>
 </resources>

@@ -2,8 +2,18 @@ package com.szpcqy.fisher.ui.fish.play;
 
 import android.content.Context;
 
+import com.szpcqy.fisher.data.login.LoginResponse;
+import com.szpcqy.fisher.data.play.AddCoinRequest;
+import com.szpcqy.fisher.data.play.PlayFishRequest;
+import com.szpcqy.fisher.data.play.QuitSlotRequest;
+import com.szpcqy.fisher.data.play.ReturnCoinRequest;
+import com.szpcqy.fisher.data.play.SwitchStrengthRequest;
 import com.szpcqy.fisher.event.pair.SocketResonse;
+import com.szpcqy.fisher.net.SocketProtocol;
+import com.szpcqy.fisher.tool.CacheTool;
 import com.szpcqy.fisher.ui.base.presenter.impl.MvpBasePresenter;
+
+import es.dmoral.toasty.Toasty;
 
 /**
  * $dsc
@@ -24,11 +34,82 @@ public class FishPlayPresenter extends MvpBasePresenter<FishPlayView> {
 
     @Override
     public void onSucess(int protocol, SocketResonse res) {
-
+        switch (protocol) {
+            case SocketProtocol.SWITCH_STRENTH_RES:
+                //切换大炮
+                getView().switchStrengthSuccess();
+                break;
+            case SocketProtocol.DIRECTION_FIRE_RES:
+                getView().fireSuccess();
+                break;
+            case SocketProtocol.COINOUT_RES:
+                getView().returnCoinSuccess();
+                break;
+            case SocketProtocol.COININ_RES:
+                LoginResponse loginResponse = res.read(LoginResponse.class, res.getData());
+                getView().addCoinSuccess(loginResponse);
+                break;
+            case SocketProtocol.QUIT_SLOT_RES:
+                getView().quitSlotSuccess();
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
     public void onFail(int protocol, String msg) {
+        switch (protocol) {
+            case SocketProtocol.SWITCH_STRENTH_RES:
+            case SocketProtocol.DIRECTION_FIRE_RES:
+            case SocketProtocol.COINOUT_RES:
+            case SocketProtocol.COININ_RES:
+            case SocketProtocol.QUIT_SLOT_RES:
+                Toasty.warning(getContext(), msg).show();
+                break;
+            default:
+                break;
+        }
+    }
 
+    /**
+     * 加币
+     *
+     * @param request
+     */
+    public void addCoin(AddCoinRequest request) {
+        model.addCoin(request);
+    }
+
+    /**
+     * 退币
+     */
+    public void returnCoin() {
+        ReturnCoinRequest returnCoinRequest = new ReturnCoinRequest(SocketProtocol.COINOUT_REQ);
+        model.returnCoin(returnCoinRequest);
+    }
+
+    /**
+     * 玩
+     *
+     * @param request
+     */
+    public void play(PlayFishRequest request) {
+        model.play(request);
+    }
+
+    /**
+     * 退出控制位
+     */
+    public void quitSlot() {
+        QuitSlotRequest quitSlotRequest = new QuitSlotRequest(SocketProtocol.QUIT_SLOT_REQ);
+        model.quitSlot(quitSlotRequest);
+    }
+    /**
+     * 退出控制位
+     */
+    public void switchStrength() {
+        SwitchStrengthRequest quitSlotRequest = new SwitchStrengthRequest(SocketProtocol.SWITCH_STRENTH_REQ);
+        model.switchStrength(quitSlotRequest);
     }
 }

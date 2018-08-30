@@ -10,6 +10,7 @@ import com.szpcqy.fisher.event.pair.SocketResonse;
 import com.szpcqy.fisher.mt.MTActivity;
 import com.szpcqy.fisher.tool.CacheTool;
 import com.szpcqy.fisher.ui.fish.FishHallActivity;
+import com.szpcqy.fisher.view.AddCoinDialog;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -79,7 +80,7 @@ public class GameSelectActivity extends MTActivity {
 
                 break;
             case R.id.iv_arena:
-                //竞技场
+
                 break;
             case R.id.iv_fish:
                 //捕鱼
