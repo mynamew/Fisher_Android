@@ -11,7 +11,7 @@ import com.szpcqy.fisher.ui.fragment.DeskBaseFragment;
 import java.util.ArrayList;
 
 /**
- * $dsc
+ * $dsc fragment的adapter
  * author: timi
  * create at: 2018-08-26 15:20
  */
