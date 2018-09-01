@@ -39,7 +39,7 @@ import butterknife.OnClick;
  * @author jzk
  * create at: 2018/8/25 14:10
  */
-public class LoginActivity extends MTMvpActivity<LoginView,LoginPresenter> implements LoginView {
+public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> implements LoginView {
 
     MTDialog.MTDialogContent dia;
     @BindView(R.id.iv_return)
@@ -59,14 +59,6 @@ public class LoginActivity extends MTMvpActivity<LoginView,LoginPresenter> imple
     @BindView(R.id.tv_regist)
     TextView tvRegist;
 
-
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onNetResponse(NetResponse res) {
-        if (res.getIsConnected() && res.getIp().equals(Gateway.SERVER_IP)) {
-            confirmBtn.setEnabled(true);
-        }
-    }
 
     @Override
     public int[] listenProtocols() {
@@ -137,7 +129,7 @@ public class LoginActivity extends MTMvpActivity<LoginView,LoginPresenter> imple
                 /**
                  * 登录的请求
                  */
-                getPresenter().login(new LoginRequest(SocketProtocol.LOGIN_REQ,userName,passWord));
+                getPresenter().login(new LoginRequest(SocketProtocol.LOGIN_REQ, userName, passWord));
                 break;
             case R.id.tv_forget_psw:
                 break;
@@ -175,7 +167,7 @@ public class LoginActivity extends MTMvpActivity<LoginView,LoginPresenter> imple
 
     @Override
     public void loginFail(String msg) {
-        MTLightbox.update(getContext(), dia, MTLightbox.IconType.ERROR,msg, 1000, null);
+        MTLightbox.update(getContext(), dia, MTLightbox.IconType.ERROR, msg, 1000, null);
 
     }
 
@@ -188,15 +180,17 @@ public class LoginActivity extends MTMvpActivity<LoginView,LoginPresenter> imple
     public void dismisProgressDialog() {
 
     }
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onWifiResponse(WifiResponse res) {
-        if (res.getIsConnected() && res.getSsid().equals(Gateway.SERVER_SSID)) {
-            Clock.create(this).interval(500).count(1).onCompleteOnUI(new Runnable() {
-                @Override
-                public void run() {
-                    EventBus.getDefault().post(new NetRequest(NetRequest.RequestType.CONNECT, Gateway.SERVER_IP));
-                }
-            }).start();
+    @Override
+    protected void connectWifiSuccess(WifiResponse res) {
+        super.connectWifiSuccess(res);
+        autoConnectSocket(Gateway.SERVER_IP);
+    }
+
+    @Override
+    protected void connectSocketSuccess(NetResponse res) {
+        super.connectSocketSuccess(res);
+        if (res.getIsConnected() && res.getIp().equals(Gateway.SERVER_IP)) {
+            confirmBtn.setEnabled(true);
         }
     }
 }

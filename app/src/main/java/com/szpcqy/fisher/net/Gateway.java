@@ -18,7 +18,7 @@ public class Gateway {
 
     static public final String APP_NAME = "TreasureMachine";
     static public final String APP_PORT = "8080";
-    static public final String SERVER_SSID = "VGA-30BE";
+    static public final String SERVER_SSID = "VGA-0276";
     static public final String SERVER_SSPW = "12345678";
     static public final String SERVER_IP = "192.168.11.235";
 

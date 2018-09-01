@@ -9,18 +9,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jzk.utilslibrary.LogUitls;
+import com.linkcard.media.VideoSurfaceView;
 import com.szpcqy.fisher.R;
 import com.szpcqy.fisher.data.login.LoginResponse;
 import com.szpcqy.fisher.data.play.AddCoinRequest;
 import com.szpcqy.fisher.data.play.PlayFishRequest;
-import com.szpcqy.fisher.media.VideoSurfaceView;
 import com.szpcqy.fisher.mt.MTMvpActivity;
 import com.szpcqy.fisher.net.SocketProtocol;
 import com.szpcqy.fisher.tool.CacheTool;
 import com.szpcqy.fisher.tool.Clock;
 import com.szpcqy.fisher.vcard.VideoCard;
 import com.szpcqy.fisher.view.AddCoinDialog;
-import com.szpcqy.fisher.view.RegistDialog;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -35,6 +34,7 @@ import io.github.controlwear.virtual.joystick.android.JoystickView;
  */
 public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresenter> implements FishPlayView {
 
+    static public final String RATIO_COIN_MULTIPLY = "RATIO_COIN_MULTIPLY";
 
     @BindView(R.id.video_play)
     VideoSurfaceView videoPlay;
@@ -124,6 +124,8 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
 
     @Override
     public void initData() {
+        //分数
+        Double ratiocoinscore=super.getIntent().getDoubleExtra(RATIO_COIN_MULTIPLY, 1);
         tvGoldQty.setText(String.valueOf(CacheTool.getCurentGold()));
         VideoCard.playVideo(videoPlay);
         mClockPlay = Clock.create(this).interval(10).count(-1).onCountOnIO(new Runnable() {
@@ -262,5 +264,15 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     @Override
     public void switchStrengthSuccess() {
 
+    }
+
+    /**
+     * 更新金币数
+     * @param userinfo
+     */
+    @Override
+    protected void updateUserInfo(LoginResponse userinfo) {
+        super.updateUserInfo(userinfo);
+        tvGoldQty.setText(String.valueOf(userinfo.getGold()));
     }
 }

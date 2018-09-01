@@ -4,8 +4,9 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 
-import com.szpcqy.fisher.media.LinkVideoCore;
-import com.szpcqy.fisher.media.VideoSurfaceView;
+import com.linkcard.media.LinkVideoCore;
+import com.linkcard.media.VideoSurfaceView;
+
 
 public class VideoCard {
 
@@ -15,7 +16,7 @@ public class VideoCard {
 
 
     static {
-        videoStream = new LinkVideoCore();
+        videoStream = new com.linkcard.media.LinkVideoCore();
         videoStream.sysinit2(IP);
     }
 

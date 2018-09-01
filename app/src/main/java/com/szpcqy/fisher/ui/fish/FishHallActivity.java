@@ -3,7 +3,6 @@ package com.szpcqy.fisher.ui.fish;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
@@ -32,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 /**
  * 捕鱼大厅
@@ -69,13 +67,9 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onUserResponse(LoginResponse res) {
-        // TODO: 2018/8/26 设置当前金币数
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onNetResponse(NetResponse res) {
+    @Override
+    protected void connectSocketSuccess(NetResponse res) {
+        super.connectSocketSuccess(res);
         if (res.getIsConnected() == false && res.getIsRemote()) {
             //被远程关闭，退出登录
             final AppCompatActivity atx = MTApplication.getInstance().getCurrentActivity();
@@ -164,7 +158,6 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
 
     @Override
     public void deviceUpdate(FishGetAllDeskResponse res) {
-        // TODO: 2018/8/26 桌位更新
         CacheTool.updateFishGetAllDeskResponse(res);
         updateDesks(res);
     }
@@ -249,5 +242,15 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
             // TODO: 2018/8/26 设置当前桌号
         }
         mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 当用户信息发生变化是更新用户信息
+     * @param userinfo
+     */
+    @Override
+    protected void updateUserInfo(LoginResponse userinfo) {
+        super.updateUserInfo(userinfo);
+        // TODO: 2018/9/1  更新用户的金币数，头像，昵称等
     }
 }

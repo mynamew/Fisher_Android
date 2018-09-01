@@ -8,7 +8,7 @@
     android:background="@mipmap/game_select_bg"
     tools:context=".ui.fish.play.FishPlayActivity">
 
-    <com.szpcqy.fisher.media.VideoSurfaceView
+    <com.linkcard.media.VideoSurfaceView
         android:id="@+id/video_play"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -10,10 +10,15 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.widget.TextView;
 
+import com.szpcqy.fisher.data.login.LoginRequest;
+import com.szpcqy.fisher.data.login.LoginResponse;
 import com.szpcqy.fisher.event.pair.NetRequest;
+import com.szpcqy.fisher.event.pair.NetResponse;
 import com.szpcqy.fisher.event.pair.SocketResonse;
+import com.szpcqy.fisher.event.pair.WifiRequest;
 import com.szpcqy.fisher.event.pair.WifiResponse;
-import com.szpcqy.fisher.net.Gateway;
+import com.szpcqy.fisher.net.SocketProtocol;
+import com.szpcqy.fisher.tool.CacheTool;
 import com.szpcqy.fisher.tool.Clock;
 
 import org.greenrobot.eventbus.EventBus;
@@ -66,7 +71,65 @@ public abstract class MTActivity extends AppCompatActivity {
     }
 
     /**
+     * 自动连接wifi
+     * @param wifiName
+     * @param wifiPsw
+     */
+    public void autoConnectWifi(String wifiName,String wifiPsw){
+        EventBus.getDefault().post(new WifiRequest(wifiName, wifiPsw));
+    }
+
+    /**
+     * wifi连接成功的监听事件
+     * @param res
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onWifiResponse(WifiResponse res) {
+        connectWifiSuccess(res);
+    }
+
+    /**
+     * 连接wifi成功  界面重写继续连接socket
+     * @param res
+     */
+    protected  void connectWifiSuccess(WifiResponse res){
+
+    }
+
+    /**
+     * 自动连接socket
+     * @param serverip
+     */
+    public void  autoConnectSocket(String serverip){
+        //连上机器wifi-连接socket
+        Clock.create(this).interval(500).count(1).onCompleteOnUI(new Runnable() {
+            @Override
+            public void run() {
+                EventBus.getDefault().post(new NetRequest(NetRequest.RequestType.CONNECT, serverip));
+            }
+        }).start();
+    }
+
+    /**
+     * 注册链接socket的事件
+     * @param res
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNetResponse(NetResponse res) {
+        if (res.getIsConnected()) {
+            connectSocketSuccess(res);
+        }
+    }
+    /**
+     * 连接Socket成功  界面重写继续连接socket
+     * @param res
+     */
+    protected  void connectSocketSuccess(NetResponse res){
+
+    }
+    /**
      * 注册监听Socket发送的事件
+     *
      * @param res
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -80,6 +143,15 @@ public abstract class MTActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 注册监听更新了用户的事件发送的事件
+     *
+     * @param res
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUserInfoUpdate(LoginResponse res) {
+        updateUserInfo(res);
+    }
 
 
     /*************RecycleView和NesrollView滑动冲突解决*********************************************/
@@ -95,7 +167,9 @@ public abstract class MTActivity extends AppCompatActivity {
         rlv.setLayoutManager(layoutManager);
         rlv.setNestedScrollingEnabled(false);
         rlv.setHasFixedSize(true);
-    }  /**
+    }
+
+    /**
      * 设置 文本
      *
      * @param tv
@@ -135,6 +209,7 @@ public abstract class MTActivity extends AppCompatActivity {
         }
         tv.setText(content);
     }
+
     /**
      * 设置布局id
      *
@@ -154,12 +229,14 @@ public abstract class MTActivity extends AppCompatActivity {
 
     /**
      * 设置当前Activity拦截的事件
+     *
      * @return
      */
     public abstract int[] listenProtocols();
 
     /**
      * 界面拿到Socket的返回
+     *
      * @param res
      */
     public abstract void execResponse(SocketResonse res);
@@ -167,7 +244,15 @@ public abstract class MTActivity extends AppCompatActivity {
     /**
      * 初始化Mvp   用于子类实现
      */
-    protected   void initMVp(){
+    protected void initMVp() {
+
+    }
+    /**
+     * 更新用戶信息（重写方法即可更新数据）
+     *
+     * @return
+     */
+    protected void updateUserInfo(LoginResponse userinfo) {
 
     }
 }

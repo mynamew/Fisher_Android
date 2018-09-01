@@ -12,7 +12,6 @@ import com.szpcqy.fisher.data.fish.FishGetAllDeskResponse;
 import com.szpcqy.fisher.data.fish.FishJoinSlotRequest;
 import com.szpcqy.fisher.data.login.LoginRequest;
 import com.szpcqy.fisher.data.login.LoginResponse;
-import com.szpcqy.fisher.event.pair.NetRequest;
 import com.szpcqy.fisher.event.pair.NetResponse;
 import com.szpcqy.fisher.event.pair.SocketResonse;
 import com.szpcqy.fisher.event.pair.WifiRequest;
@@ -25,15 +24,13 @@ import com.szpcqy.fisher.mt.MTMvpActivity;
 import com.szpcqy.fisher.net.SocketProtocol;
 import com.szpcqy.fisher.net.vo.GameSLotVO;
 import com.szpcqy.fisher.tool.CacheTool;
-import com.szpcqy.fisher.tool.Clock;
+import com.szpcqy.fisher.ui.fish.play.FishPlayActivity;
 import com.szpcqy.fisher.ui.fragment.DeskBaseFragment;
 import com.szpcqy.fisher.ui.fragment.DeskEightFragment;
 import com.szpcqy.fisher.ui.fragment.DeskSixFragment;
 import com.szpcqy.fisher.ui.login.LoginActivity;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
@@ -76,7 +73,10 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
                 fishGetAllDeskResponse = fishGetAllDeskResponses.get(i);
             }
         }
-        EventBus.getDefault().post(new WifiRequest(fishGetAllDeskResponse.getDevicessid(), fishGetAllDeskResponse.getDevicesspw()));
+        /**
+         * 自动连接wifi
+         */
+        autoConnectWifi(fishGetAllDeskResponse.getDevicessid(), fishGetAllDeskResponse.getDevicesspw());
         /**
          * 不同的桌子
          */
@@ -89,6 +89,9 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
         FragmentTransaction transaction = super.getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fg_desk, fragment);
         transaction.commit();
+        /**
+         * 桌位的点击事件
+         */
         fragment.setOnClickListener(new DeskBaseFragment.OnClickListener() {
             @Override
             public void onDeviceClick() {
@@ -97,6 +100,11 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
 
             @Override
             public void onSlotClick(int pos) {
+                /**
+                 * 对桌位进行判断
+                 * 1、维护中  没有桌位信息
+                 * 2、位置有人
+                 */
                 if (fishGetAllDeskResponse == null) {
                     Toasty.error(getContext(), "设备维护中").show();
                     return;
@@ -158,13 +166,23 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
         dia.close();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onNetResponse(NetResponse res) {
+
+    @Override
+    protected void connectSocketSuccess(NetResponse res) {
+        super.connectSocketSuccess(res);
         if (res.getIsConnected() && res.getIp().equals(fishGetAllDeskResponse.getServerip())) {
             //socket连接成功-自动登录
             getPresenter().login(new LoginRequest(SocketProtocol.LOGIN_REQ,
                     CacheTool.getCurentUsername(),
                     CacheTool.getPsw()));
+        }
+    }
+
+    @Override
+    protected void connectWifiSuccess(WifiResponse res) {
+        super.connectWifiSuccess(res);
+        if (res.getIsConnected() && res.getSsid().equals(fishGetAllDeskResponse.getDevicessid())) {
+            autoConnectSocket(fishGetAllDeskResponse.getServerip());
         }
     }
 
@@ -223,6 +241,17 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
         }
     }
 
+    /**
+     * 更新用户信息
+     *
+     * @param userinfo
+     */
+    @Override
+    protected void updateUserInfo(LoginResponse userinfo) {
+        super.updateUserInfo(userinfo);
+        // TODO: 2018/9/1 更新用户信息
+    }
+
     @Override
     public void getSingleDeskFail(String mesg) {
         LogUitls.d("获取桌位失败！");
@@ -251,19 +280,8 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
     @Override
     public void joinSlotSuccess(SocketResonse res) {
         MTLightbox.update(getContext(), dia, MTLightbox.IconType.SUCCESS, "加入座位成功", 1000);
-
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onWifiResponse(WifiResponse res) {
-        if (res.getIsConnected() && res.getSsid().equals(fishGetAllDeskResponse.getDevicessid())) {
-            //连上机器wifi-连接socket
-            Clock.create(this).interval(500).count(1).onCompleteOnUI(new Runnable() {
-                @Override
-                public void run() {
-                    EventBus.getDefault().post(new NetRequest(NetRequest.RequestType.CONNECT, fishGetAllDeskResponse.getServerip()));
-                }
-            }).start();
-        }
+        Intent it = new Intent(getContext(), FishPlayActivity.class);
+        it.putExtra(FishPlayActivity.RATIO_COIN_MULTIPLY, fishGetAllDeskResponse.getRatiocoinscore());
+        startActivity(it);
     }
 }
