@@ -12,14 +12,17 @@ import com.jzk.utilslibrary.LogUitls;
 import com.linkcard.media.VideoSurfaceView;
 import com.szpcqy.fisher.R;
 import com.szpcqy.fisher.data.login.LoginResponse;
-import com.szpcqy.fisher.data.play.AddCoinRequest;
-import com.szpcqy.fisher.data.play.PlayFishRequest;
+import com.szpcqy.fisher.event.pair.SocketRequest;
+import com.szpcqy.fisher.mt.MTDialog;
+import com.szpcqy.fisher.mt.MTLightbox;
 import com.szpcqy.fisher.mt.MTMvpActivity;
 import com.szpcqy.fisher.net.SocketProtocol;
 import com.szpcqy.fisher.tool.CacheTool;
 import com.szpcqy.fisher.tool.Clock;
 import com.szpcqy.fisher.vcard.VideoCard;
 import com.szpcqy.fisher.view.AddCoinDialog;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -33,9 +36,12 @@ import io.github.controlwear.virtual.joystick.android.JoystickView;
  * create at: 2018/8/27 17:26
  */
 public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresenter> implements FishPlayView {
-
+     //金币数
     static public final String RATIO_COIN_MULTIPLY = "RATIO_COIN_MULTIPLY";
-
+    //位置的bundle
+    static public final String SLOT_POSITION = "SLOT_POSITION";
+    //桌子的类型 8还是6
+    static public final String DESK_TYPE = "DESK_TYPE";
     @BindView(R.id.video_play)
     VideoSurfaceView videoPlay;
     @BindView(R.id.joystick)
@@ -108,24 +114,41 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
          * 发射
          */
         ivShoot.setOnTouchListener((v, event) -> {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
+            boolean bol = super.onTouchEvent(event);
+            if (ivShoot.isEnabled()) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     isFireTouch = 1;
-                    break;
-                case MotionEvent.ACTION_UP:
+                    return true;
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     isFireTouch = 0;
-                    break;
-                default:
-                    break;
+                    return true;
+                }
             }
-            return false;
+            return bol;
+        });
+//        int deskType = getIntent().getIntExtra(DESK_TYPE, 0);
+//        int slotCurrentPosition= getIntent().getIntExtra(SLOT_POSITION, 0);
+//        if(deskType==1){
+//            if(slotCurrentPosition==5||slotCurrentPosition==6||slotCurrentPosition==7){
+//                findViewById(R.id.ll_content).setRotation(180);
+//            }
+//        }else {
+//            if(slotCurrentPosition==4||slotCurrentPosition==5){
+//                findViewById(R.id.ll_content).setRotation(180);
+//            }
+//        }
+        findViewById(R.id.ll_bottom).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findViewById(R.id.ll_content).setRotation(180);
+            }
         });
     }
 
     @Override
     public void initData() {
         //分数
-        Double ratiocoinscore=super.getIntent().getDoubleExtra(RATIO_COIN_MULTIPLY, 1);
+        Double ratiocoinscore = super.getIntent().getDoubleExtra(RATIO_COIN_MULTIPLY, 1);
         tvGoldQty.setText(String.valueOf(CacheTool.getCurentGold()));
         VideoCard.playVideo(videoPlay);
         mClockPlay = Clock.create(this).interval(10).count(-1).onCountOnIO(new Runnable() {
@@ -134,11 +157,13 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
                 if (isFireTouch == 0 && isLeftTouch == 0 && isRightTouch == 0 && isUpTouch == 0 && isDownTouch == 0) {
                     return;
                 }
-                /**
-                 * 请求
-                 */
-                PlayFishRequest playFishRequest = new PlayFishRequest(SocketProtocol.DIRECTION_FIRE_REQ, isLeftTouch, isRightTouch, isUpTouch, isDownTouch, isFireTouch);
-                getPresenter().play(playFishRequest);
+                SocketRequest req = new SocketRequest(SocketProtocol.DIRECTION_FIRE_REQ);
+                req.add("isfire", isFireTouch);
+                req.add("isleft", isLeftTouch);
+                req.add("isright", isRightTouch);
+                req.add("isup", isUpTouch);
+                req.add("isdown", isDownTouch);
+                EventBus.getDefault().post(req);
             }
         }).start();
     }
@@ -164,14 +189,22 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
         return this;
     }
 
+    MTDialog.MTDialogContent dia;
+
     @Override
     public void showProgressDialog(int protocol) {
-
+        switch (protocol) {
+            case SocketProtocol.COININ_REQ:
+                dia = MTLightbox.show(getContext(), MTLightbox.IconType.PROGRESS, "投币中...", false);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
     public void dismisProgressDialog() {
-
+        dia.close();
     }
 
     @OnClick({R.id.iv_add_coin, R.id.iv_return_coin, R.id.ll_left_menu, R.id.iv_add_gun})
@@ -184,8 +217,10 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
                     @Override
                     public void commit(int score) {
                         LogUitls.e("加币---->" + score);
-                        //加币的请求
-                        getPresenter().addCoin(new AddCoinRequest(SocketProtocol.COININ_REQ,score));
+                        if (score > 0) {
+                            //加币的请求
+                            getPresenter().addCoin(score);
+                        }
                     }
                 }).setCurrentScore(String.valueOf(CacheTool.getCurentGold())).show();
                 break;
@@ -240,7 +275,16 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (dia != null) {
+            dia.close();
+        }
+    }
+
+    @Override
     public void addCoinSuccess(LoginResponse loginResponse) {
+        dia.close();
         CacheTool.setCurrentLoginResponse(loginResponse);
         tvGoldQty.setText(String.valueOf(loginResponse.getGold()));
     }
@@ -258,16 +302,17 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
 
     @Override
     public void fireSuccess() {
-
+        LogUitls.e("发炮成功！");
     }
 
     @Override
     public void switchStrengthSuccess() {
-
+        LogUitls.e("切换炮弹成功！");
     }
 
     /**
      * 更新金币数
+     *
      * @param userinfo
      */
     @Override

@@ -63,7 +63,8 @@ public class SocketServce extends Service {
     @Subscribe(threadMode = ThreadMode.ASYNC)
     public void onSocketRequest(final CommonRequest req) {
         if (m_socket != null) {
-            m_socket.send(req._tostring());
+            String reqJson=req._tostring();
+            m_socket.send(reqJson);
         }
     }
 

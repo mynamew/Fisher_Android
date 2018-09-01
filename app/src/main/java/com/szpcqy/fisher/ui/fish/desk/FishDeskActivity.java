@@ -52,7 +52,8 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
     private FishGetAllDeskResponse fishGetAllDeskResponse = null;
     //桌号
     private String desId;
-
+    //选择的座位号，用于翻转
+    private int currentSlotSelectPosition=0;
     @Override
     public int setLayoutId() {
         return R.layout.activity_fish_desk;
@@ -114,6 +115,9 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
                         Toasty.error(getContext(), "位置维护中").show();
                         return;
                     }
+                    //设置选择的座位号
+                    currentSlotSelectPosition=pos;
+                    //发起请求
                     FishJoinSlotRequest request = new FishJoinSlotRequest(SocketProtocol.JOIN_SLOT_REQ,
                             desId, fishGetAllDeskResponse.getSlot(pos).getId());
                     getPresenter().joinSlot(request);
@@ -282,6 +286,8 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
         MTLightbox.update(getContext(), dia, MTLightbox.IconType.SUCCESS, "加入座位成功", 1000);
         Intent it = new Intent(getContext(), FishPlayActivity.class);
         it.putExtra(FishPlayActivity.RATIO_COIN_MULTIPLY, fishGetAllDeskResponse.getRatiocoinscore());
+        it.putExtra(FishPlayActivity.SLOT_POSITION, currentSlotSelectPosition);
+        it.putExtra(FishPlayActivity.DESK_TYPE, fishGetAllDeskResponse.getDevicetype());
         startActivity(it);
     }
 }

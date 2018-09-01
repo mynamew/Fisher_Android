@@ -69,4 +69,16 @@ public class PlayFishRequest {
     public void setIsFireTouch(int isFireTouch) {
         this.isFireTouch = isFireTouch;
     }
+
+    @Override
+    public String toString() {
+        return "PlayFishRequest{" +
+                "protocol=" + protocol +
+                ", isLeftTouch=" + isLeftTouch +
+                ", isRightTouch=" + isRightTouch +
+                ", isUpTouch=" + isUpTouch +
+                ", isDownTouch=" + isDownTouch +
+                ", isFireTouch=" + isFireTouch +
+                '}';
+    }
 }

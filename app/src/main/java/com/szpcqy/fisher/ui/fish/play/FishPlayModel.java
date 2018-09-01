@@ -2,10 +2,9 @@ package com.szpcqy.fisher.ui.fish.play;
 
 import com.szpcqy.fisher.data.play.AddCoinRequest;
 import com.szpcqy.fisher.data.play.PlayFishRequest;
-import com.szpcqy.fisher.data.play.QuitSlotRequest;
-import com.szpcqy.fisher.data.play.ReturnCoinRequest;
-import com.szpcqy.fisher.data.play.SwitchStrengthRequest;
 import com.szpcqy.fisher.event.pair.CommonRequest;
+import com.szpcqy.fisher.event.pair.SocketRequest;
+import com.szpcqy.fisher.net.SocketProtocol;
 import com.szpcqy.fisher.ui.base.model.impl.MvpBaseModel;
 
 import org.greenrobot.eventbus.EventBus;
@@ -22,25 +21,24 @@ public class FishPlayModel extends MvpBaseModel {
      * @param request
      */
     public void addCoin(AddCoinRequest request) {
-        EventBus.getDefault().post(new CommonRequest<AddCoinRequest>(request));
+
+        EventBus.getDefault().post(new CommonRequest<>(request));
     }
 
     /**
      * 退币的请求
      *
-     * @param request
      */
-    public void returnCoin(ReturnCoinRequest request) {
-        EventBus.getDefault().post(new CommonRequest<ReturnCoinRequest>(request));
+    public void returnCoin() {
+        EventBus.getDefault().post(new SocketRequest(SocketProtocol.COINOUT_REQ));
     }
 
     /**
      * 退出控制位的请求
      *
-     * @param request
      */
-    public void quitSlot(QuitSlotRequest request) {
-        EventBus.getDefault().post(new CommonRequest<QuitSlotRequest>(request));
+    public void quitSlot() {
+        EventBus.getDefault().post(new SocketRequest(SocketProtocol.QUIT_SLOT_REQ));
     }
 
     /**
@@ -49,15 +47,14 @@ public class FishPlayModel extends MvpBaseModel {
      * @param request
      */
     public void play(PlayFishRequest request) {
-        EventBus.getDefault().post(new CommonRequest<PlayFishRequest>(request));
+        EventBus.getDefault().post(new CommonRequest<>(request));
     }
 
     /**
      * 切换大炮
      *
-     * @param request
      */
-    public void switchStrength(SwitchStrengthRequest request) {
-        EventBus.getDefault().post(new CommonRequest<SwitchStrengthRequest>(request));
+    public void switchStrength( ) {
+        EventBus.getDefault().post(new SocketRequest(SocketProtocol.SWITCH_STRENTH_REQ));
     }
 }

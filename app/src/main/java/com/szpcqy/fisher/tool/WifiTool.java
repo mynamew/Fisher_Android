@@ -12,8 +12,6 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Parcelable;
 
-import com.szpcqy.fisher.utils.WifiUtils;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -109,7 +107,7 @@ public class WifiTool {
      *
      * @return
      */
-    private boolean judgeWifiIsConnectRight( ) {
+    private boolean judgeWifiIsConnectRight() {
         /**
          * 判断当前wifi名是否是想要连接的wifi
          */
@@ -117,13 +115,13 @@ public class WifiTool {
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         String currentSsid = wifiInfo.getSSID();
         ConnectivityManager connec = (ConnectivityManager) m_activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if ((connec.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED)){
+        if ((connec.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED)) {
             if (currentSsid.contains(m_ssid)) {
                 return true;
-            }else {
+            } else {
                 return false;
             }
-        }else{
+        } else {
             return false;
         }
     }
@@ -161,11 +159,7 @@ public class WifiTool {
             public void run() {
                 removeMonitor();
                 if (m_callback != null) {
-//                    if (judgeWifiIsConnectRight()) {
-//                        m_callback.onSuccess(m_ssid);
-//                    } else {
-                        m_callback.onFailure(m_ssid);
-//                    }
+                    m_callback.onFailure(m_ssid);
                 }
             }
         }).start();

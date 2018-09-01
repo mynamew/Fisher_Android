@@ -71,4 +71,5 @@ dependencies {
      * 屏幕适配
      */
     implementation 'me.jessyan:autosize:0.7.0'
+    implementation 'cat.ereza:customactivityoncrash:2.2.0'
 }

@@ -5,12 +5,8 @@ import android.content.Context;
 import com.szpcqy.fisher.data.login.LoginResponse;
 import com.szpcqy.fisher.data.play.AddCoinRequest;
 import com.szpcqy.fisher.data.play.PlayFishRequest;
-import com.szpcqy.fisher.data.play.QuitSlotRequest;
-import com.szpcqy.fisher.data.play.ReturnCoinRequest;
-import com.szpcqy.fisher.data.play.SwitchStrengthRequest;
 import com.szpcqy.fisher.event.pair.SocketResonse;
 import com.szpcqy.fisher.net.SocketProtocol;
-import com.szpcqy.fisher.tool.CacheTool;
 import com.szpcqy.fisher.ui.base.presenter.impl.MvpBasePresenter;
 
 import es.dmoral.toasty.Toasty;
@@ -75,18 +71,18 @@ public class FishPlayPresenter extends MvpBasePresenter<FishPlayView> {
     /**
      * 加币
      *
-     * @param request
+     * @param score
      */
-    public void addCoin(AddCoinRequest request) {
-        model.addCoin(request);
+    public void addCoin(int score) {
+        getView().showProgressDialog(SocketProtocol.COININ_REQ);
+        model.addCoin(new AddCoinRequest(SocketProtocol.COININ_REQ,score));
     }
 
     /**
      * 退币
      */
     public void returnCoin() {
-        ReturnCoinRequest returnCoinRequest = new ReturnCoinRequest(SocketProtocol.COINOUT_REQ);
-        model.returnCoin(returnCoinRequest);
+        model.returnCoin();
     }
 
     /**
@@ -102,14 +98,12 @@ public class FishPlayPresenter extends MvpBasePresenter<FishPlayView> {
      * 退出控制位
      */
     public void quitSlot() {
-        QuitSlotRequest quitSlotRequest = new QuitSlotRequest(SocketProtocol.QUIT_SLOT_REQ);
-        model.quitSlot(quitSlotRequest);
+        model.quitSlot();
     }
     /**
      * 退出控制位
      */
     public void switchStrength() {
-        SwitchStrengthRequest quitSlotRequest = new SwitchStrengthRequest(SocketProtocol.SWITCH_STRENTH_REQ);
-        model.switchStrength(quitSlotRequest);
+        model.switchStrength();
     }
 }
