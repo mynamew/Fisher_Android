@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.szpcqy.fisher.tool.CacheTool;
 import com.szpcqy.fisher.ui.fish.desk.FishDeskActivity;
 import com.szpcqy.fisher.ui.fragment.DeskBaseFragment;
 
@@ -33,6 +34,7 @@ public class MyAdapter extends FragmentPagerAdapter {
         frag.setOnClickListener(new DeskBaseFragment.OnClickListener() {
             @Override
             public void onDeviceClick() {
+                CacheTool.setCurrentFishDesk(frag.getDeskFishVO());
                 // TODO: 2018/8/26 跳转到桌位
                 Intent it = new Intent(mContext, FishDeskActivity.class);
                 it.putExtra(FishDeskActivity.DESKID, deskId);
@@ -42,6 +44,7 @@ public class MyAdapter extends FragmentPagerAdapter {
 
             @Override
             public void onSlotClick(int pos) {
+                CacheTool.setCurrentFishDesk(frag.getDeskFishVO());
                 // TODO: 2018/8/26 跳转到桌位
                 Intent it = new Intent(mContext, FishDeskActivity.class);
                 it.putExtra(FishDeskActivity.DESKID, deskId);

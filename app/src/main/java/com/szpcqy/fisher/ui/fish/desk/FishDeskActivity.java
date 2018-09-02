@@ -69,13 +69,7 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
     @Override
     public void initData() {
         desId = getIntent().getStringExtra(DESKID);
-        fishGetAllDeskResponse = null;
-        List<FishGetAllDeskResponse> fishGetAllDeskResponses = CacheTool.getFishGetAllDeskResponse();
-        for (int i = 0; i < fishGetAllDeskResponses.size(); i++) {
-            if (desId.equals(fishGetAllDeskResponses.get(i).getId())) {
-                fishGetAllDeskResponse = fishGetAllDeskResponses.get(i);
-            }
-        }
+        fishGetAllDeskResponse= CacheTool.getCurrentFishDesk();
         /**
          * 自动连接wifi
          */
@@ -153,7 +147,6 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
         switch (protocol) {
             case SocketProtocol.LOGIN_REQ:
                 dia = MTLightbox.show(getContext(), MTLightbox.IconType.PROGRESS, "自动登录中", false);
-
                 break;
             case SocketProtocol.JOIN_SLOT_REQ:
                 dia = MTLightbox.show(getContext(), MTLightbox.IconType.PROGRESS, "加入座位中", false);

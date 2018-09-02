@@ -6,12 +6,11 @@ import com.szpcqy.fisher.data.login.LoginResponse;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.List;
-
 public class CacheTool {
     static public LoginResponse response = null;
-    static public List<FishGetAllDeskResponse> responseFishDesks = null;
-    static public String psw="";
+    static public FishGetAllDeskResponse currentFishDesk = null;
+    static public String psw = "";
+
     /**
      * 设置登录的信息 缓存
      *
@@ -33,29 +32,12 @@ public class CacheTool {
      *
      * @param res
      */
-    static public void setFishGetAllDeskResponse(List<FishGetAllDeskResponse> res) {
-        responseFishDesks = res;
-        if (responseFishDesks != null) {
-        }
+    static public void setCurrentFishDesk(FishGetAllDeskResponse res) {
+        currentFishDesk = res;
     }
 
-    /**
-     * 更新桌位的信息
-     *
-     * @param res
-     */
-    static public void updateFishGetAllDeskResponse(FishGetAllDeskResponse res) {
-        if (responseFishDesks != null) {
-            for (int i = 0; i < responseFishDesks.size(); i++) {
-                if (responseFishDesks.get(i).getId().equals(res.getId())) {
-                    responseFishDesks.set(i, res);
-                }
-            }
-        }
-    }
-
-    static public List<FishGetAllDeskResponse> getFishGetAllDeskResponse() {
-        return responseFishDesks;
+    static public FishGetAllDeskResponse getCurrentFishDesk() {
+        return currentFishDesk;
     }
 
     /**
@@ -75,6 +57,7 @@ public class CacheTool {
     static public String getCurentUsername() {
         return response.getUserVO().getLoginname();
     }
+
     /**
      * 获取当前用户id
      *
@@ -83,8 +66,10 @@ public class CacheTool {
     static public String getCurrentId() {
         return response.getUserVO().getId();
     }
+
     /**
      * 获取密码
+     *
      * @return
      */
     public static String getPsw() {
@@ -92,7 +77,8 @@ public class CacheTool {
     }
 
     /**
-     *  设置密码
+     * 设置密码
+     *
      * @param psw
      */
     public static void setPsw(String psw) {

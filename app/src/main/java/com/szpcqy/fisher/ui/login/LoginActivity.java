@@ -2,7 +2,6 @@ package com.szpcqy.fisher.ui.login;
 
 import android.content.Intent;
 import android.text.TextUtils;
-import android.util.SparseArray;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,6 +26,7 @@ import com.szpcqy.fisher.tool.CacheTool;
 import com.szpcqy.fisher.ui.fish.play.FishPlayActivity;
 import com.szpcqy.fisher.ui.game.GameSelectActivity;
 import com.szpcqy.fisher.utils.ToastUtils;
+import com.szpcqy.fisher.utils.WifiUtils;
 import com.szpcqy.fisher.view.MTImageView;
 import com.szpcqy.fisher.view.RegistDialog;
 
@@ -83,6 +83,7 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
 
     @Override
     public void initData() {
+        LogUitls.e("当前的ip--->",WifiUtils.getWifiRouteIPAddress(this));
 
     }
 
@@ -174,8 +175,31 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
                  * 是否是断线重连的状态
                  */
                 if (null != response.getDeviceVO() && null != response.getSlotVO()) {
-                    LoginResponse.DeviceVOBean deviceVO = response.getDeviceVO();
-                    autoConnectWifi(deviceVO.getDevicessid(), deviceVO.getDevicesspw());
+                    /**
+                     * 如果当前ip和socket的ip地址一样则直接加入控制位
+                     */
+                    if (WifiUtils.getWifiRouteIPAddress(LoginActivity.this).equals(response.getDeviceVO().getServerip())) {
+//                        MTLightbox.update(LoginActivity.this,dia, MTLightbox.IconType.PROGRESS,"加入座位中");
+                        //自动跳转游戏机并且 加入控制位
+                        LoginResponse currentLoginResponse = CacheTool.getCurrentLoginResponse();
+                        FishJoinSlotRequest request = new FishJoinSlotRequest(SocketProtocol.JOIN_SLOT_REQ
+                                , currentLoginResponse.getDeviceVO().getId()
+                                , currentLoginResponse.getSlotVO().getId());
+                        getPresenter().joinSlot(request);
+                        return;
+                    }
+                    if (null != CacheTool.getCurrentLoginResponse().getDeviceVO() && null != CacheTool.getCurrentLoginResponse().getSlotVO()) {
+//                        MTLightbox.update(LoginActivity.this,dia, MTLightbox.IconType.PROGRESS,"加入座位中");
+                        //自动跳转游戏机并且 加入控制位
+                        LoginResponse currentLoginResponse = CacheTool.getCurrentLoginResponse();
+                        FishJoinSlotRequest request = new FishJoinSlotRequest(SocketProtocol.JOIN_SLOT_REQ
+                                , currentLoginResponse.getDeviceVO().getId()
+                                , currentLoginResponse.getSlotVO().getId());
+                        getPresenter().joinSlot(request);
+                    } else {
+                        LoginResponse.DeviceVOBean deviceVO = response.getDeviceVO();
+                        autoConnectWifi(deviceVO.getDevicessid(), deviceVO.getDevicesspw());
+                    }
                 } else {
                     Intent it = new Intent(getContext(), GameSelectActivity.class);
                     startActivity(it);
@@ -203,42 +227,46 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
         Intent it = new Intent(getContext(), FishPlayActivity.class);
         LoginResponse currentLoginResponse = CacheTool.getCurrentLoginResponse();
         LoginResponse.DeviceVOBean deviceVO = currentLoginResponse.getDeviceVO();
-        int currentSlotSelectPosition=1;
-        String userId=CacheTool.getCurrentId();
-        if(null!=deviceVO&&deviceVO.getSlot1().equals(userId)){
-            currentSlotSelectPosition=1;
+        int currentSlotSelectPosition = 1;
+        String userId = CacheTool.getCurrentId();
+        if (null != deviceVO && deviceVO.getSlot1().equals(userId)) {
+            currentSlotSelectPosition = 1;
         }
-        if(null!=deviceVO&&deviceVO.getSlot2().equals(userId)){
-            currentSlotSelectPosition=2;
+        if (null != deviceVO && deviceVO.getSlot2().equals(userId)) {
+            currentSlotSelectPosition = 2;
         }
-        if(null!=deviceVO&&deviceVO.getSlot3().equals(userId)){
-            currentSlotSelectPosition=3;
+        if (null != deviceVO && deviceVO.getSlot3().equals(userId)) {
+            currentSlotSelectPosition = 3;
         }
-        if(null!=deviceVO&&deviceVO.getSlot4().equals(userId)){
-            currentSlotSelectPosition=4;
+        if (null != deviceVO && deviceVO.getSlot4().equals(userId)) {
+            currentSlotSelectPosition = 4;
         }
-        if(null!=deviceVO&&deviceVO.getSlot5().equals(userId)){
-            currentSlotSelectPosition=5;
+        if (null != deviceVO && deviceVO.getSlot5().equals(userId)) {
+            currentSlotSelectPosition = 5;
         }
-        if(null!=deviceVO&&deviceVO.getSlot6().equals(userId)){
-            currentSlotSelectPosition=6;
+        if (null != deviceVO && deviceVO.getSlot6().equals(userId)) {
+            currentSlotSelectPosition = 6;
         }
-        if(null!=deviceVO&&deviceVO.getSlot7().equals(userId)){
-            currentSlotSelectPosition=7;
+        if (null != deviceVO && deviceVO.getSlot7().equals(userId)) {
+            currentSlotSelectPosition = 7;
         }
-        if(null!=deviceVO&&deviceVO.getSlot8().equals(userId)){
-            currentSlotSelectPosition=8;
+        if (null != deviceVO && deviceVO.getSlot8().equals(userId)) {
+            currentSlotSelectPosition = 8;
         }
         it.putExtra(FishPlayActivity.RATIO_COIN_MULTIPLY, deviceVO.getRatiocoinscore());
         it.putExtra(FishPlayActivity.SLOT_POSITION, currentSlotSelectPosition);
-        it.putExtra(FishPlayActivity.DESK_TYPE,deviceVO.getDevicetype());
+        it.putExtra(FishPlayActivity.DESK_TYPE, deviceVO.getDevicetype());
+        /**
+         * 清空重连信息
+         */
+        CacheTool.getCurrentLoginResponse().setDeviceVO(null);
+        CacheTool.getCurrentLoginResponse().setSlotVO(null);
         startActivity(it);
     }
 
     @Override
     public void showProgressDialog(int pro) {
         if (pro == SocketProtocol.JOIN_SLOT_REQ) {
-            dia = MTLightbox.show(getContext(), MTLightbox.IconType.PROGRESS, "加入座位中", false);
         } else {
             dia = MTLightbox.show(getContext(), MTLightbox.IconType.PROGRESS, "登录中", false);
         }
@@ -273,12 +301,11 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
             if (res.getIp().equals(Gateway.SERVER_IP) && null == CacheTool.getCurrentLoginResponse()) {
                 confirmBtn.setEnabled(true);
             } else {
-                //自动跳转游戏机并且 加入控制位
-                LoginResponse currentLoginResponse = CacheTool.getCurrentLoginResponse();
-                FishJoinSlotRequest request = new FishJoinSlotRequest(SocketProtocol.JOIN_SLOT_REQ
-                        , currentLoginResponse.getDeviceVO().getId()
-                        , currentLoginResponse.getSlotVO().getId());
-                getPresenter().joinSlot(request);
+                /**
+                 * 登录的请求
+                 */
+                getPresenter().login(new LoginRequest(SocketProtocol.LOGIN_REQ, etUsername.getText().toString().trim()
+                        , etPassword.getText().toString().trim()));
             }
         }
     }

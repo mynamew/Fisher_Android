@@ -10,7 +10,7 @@ public class GameSLotVO implements Serializable {
 	private String id;
 	private String com;
 	private int enable;
-	private LoginResponse userVO;
+	private LoginResponse.UserVOBeanXX userVO;
 
 
 
@@ -38,11 +38,11 @@ public class GameSLotVO implements Serializable {
 	public void setEnable(int enable) {
 		this.enable = enable;
 	}
-	public LoginResponse getUserVO() {
+	public LoginResponse.UserVOBeanXX getUserVO() {
 		return userVO;
 	}
-	public void setUserVO(LoginResponse userVO) {
+	public void setUserVO(LoginResponse.UserVOBeanXX userVO) {
 		this.userVO = userVO;
 	}
-	
+
 }

@@ -148,7 +148,6 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
 
     @Override
     public void getAllDeskSuccess(List<FishGetAllDeskResponse> mDatas) {
-        CacheTool.setFishGetAllDeskResponse(mDatas);
         MTLightbox.update(getContext(), dia, MTLightbox.IconType.SUCCESS, "获取桌位成功", 1000);
         LogUitls.d("获取到的桌位信息 FishHall-->" + mDatas);
         mFishDesks.clear();
@@ -158,7 +157,6 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
 
     @Override
     public void deviceUpdate(FishGetAllDeskResponse res) {
-        CacheTool.updateFishGetAllDeskResponse(res);
         updateDesks(res);
     }
 
