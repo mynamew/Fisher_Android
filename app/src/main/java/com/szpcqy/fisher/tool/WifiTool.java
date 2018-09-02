@@ -193,6 +193,8 @@ public class WifiTool {
                         } else {
                             //因为会被调用很多次，所以要一直等待
                         }
+                    }else {
+
                     }
                 }
             }

@@ -64,7 +64,7 @@ public class CacheTool {
      * @return
      */
     static public int getCurentGold() {
-        return response.getGold();
+        return response.getUserVO().getGold();
     }
 
     /**
@@ -73,9 +73,16 @@ public class CacheTool {
      * @return
      */
     static public String getCurentUsername() {
-        return response.getLoginname();
+        return response.getUserVO().getLoginname();
     }
-
+    /**
+     * 获取当前用户id
+     *
+     * @return
+     */
+    static public String getCurrentId() {
+        return response.getUserVO().getId();
+    }
     /**
      * 获取密码
      * @return

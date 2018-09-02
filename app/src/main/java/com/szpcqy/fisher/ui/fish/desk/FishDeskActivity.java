@@ -24,11 +24,13 @@ import com.szpcqy.fisher.mt.MTMvpActivity;
 import com.szpcqy.fisher.net.SocketProtocol;
 import com.szpcqy.fisher.net.vo.GameSLotVO;
 import com.szpcqy.fisher.tool.CacheTool;
+import com.szpcqy.fisher.ui.fish.FishHallActivity;
 import com.szpcqy.fisher.ui.fish.play.FishPlayActivity;
 import com.szpcqy.fisher.ui.fragment.DeskBaseFragment;
 import com.szpcqy.fisher.ui.fragment.DeskEightFragment;
 import com.szpcqy.fisher.ui.fragment.DeskSixFragment;
 import com.szpcqy.fisher.ui.login.LoginActivity;
+import com.szpcqy.fisher.utils.ActivityUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -176,9 +178,10 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
         super.connectSocketSuccess(res);
         if (res.getIsConnected() && res.getIp().equals(fishGetAllDeskResponse.getServerip())) {
             //socket连接成功-自动登录
-            getPresenter().login(new LoginRequest(SocketProtocol.LOGIN_REQ,
+            LoginRequest loginRequest = new LoginRequest(SocketProtocol.LOGIN_REQ,
                     CacheTool.getCurentUsername(),
-                    CacheTool.getPsw()));
+                    CacheTool.getPsw());
+            getPresenter().login(loginRequest);
         }
     }
 
@@ -280,7 +283,6 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
     public void joinSlotFail(String msg) {
         Toasty.warning(getContext(), msg).show();
     }
-
     @Override
     public void joinSlotSuccess(SocketResonse res) {
         MTLightbox.update(getContext(), dia, MTLightbox.IconType.SUCCESS, "加入座位成功", 1000);
@@ -289,5 +291,19 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
         it.putExtra(FishPlayActivity.SLOT_POSITION, currentSlotSelectPosition);
         it.putExtra(FishPlayActivity.DESK_TYPE, fishGetAllDeskResponse.getDevicetype());
         startActivity(it);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        /**
+         * 如果Activity栈中有桌位的Activity即FishDeskActivity 则直接返回否则执行跳转操作
+         */
+        if (ActivityUtils.isExsitActivity(FishHallActivity.class, this)) {
+            finish();
+        } else {
+            Intent it = new Intent(this, FishHallActivity.class);
+            startActivity(it);
+        }
     }
 }

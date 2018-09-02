@@ -162,10 +162,10 @@ public class DeskEightFragment extends DeskBaseFragment {
                 repareImg.setVisibility(View.INVISIBLE);
                 userSeat.setVisibility(View.VISIBLE);
                 userSeatAnimate.stop();
-                if(slotVO.getUserVO().getId().equals(CacheTool.getCurrentLoginResponse().getId())){
+                if(slotVO.getUserVO().getUserVO().getId().equals(CacheTool.getCurrentLoginResponse().getUserVO().getId())){
                     nameTxt.setText("我自己");
                 }else{
-                    nameTxt.setText(slotVO.getUserVO().getLoginname());
+                    nameTxt.setText(slotVO.getUserVO().getUserVO().getLoginname());
                     Log.d("MT", "名字");
                 }
             }

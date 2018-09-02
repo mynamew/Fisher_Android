@@ -1,5 +1,8 @@
 package com.szpcqy.fisher.mt;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
@@ -8,24 +11,27 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.szpcqy.fisher.data.login.LoginRequest;
 import com.szpcqy.fisher.data.login.LoginResponse;
 import com.szpcqy.fisher.event.pair.NetRequest;
 import com.szpcqy.fisher.event.pair.NetResponse;
 import com.szpcqy.fisher.event.pair.SocketResonse;
 import com.szpcqy.fisher.event.pair.WifiRequest;
 import com.szpcqy.fisher.event.pair.WifiResponse;
-import com.szpcqy.fisher.net.SocketProtocol;
 import com.szpcqy.fisher.tool.CacheTool;
 import com.szpcqy.fisher.tool.Clock;
+import com.szpcqy.fisher.ui.login.LoginActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.ButterKnife;
+
+import static com.szpcqy.fisher.net.SocketProtocol.KICK_OUT_RES;
 
 /**
  * Created by Master on 2017/10/31.
@@ -42,6 +48,10 @@ public abstract class MTActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //去掉标题栏
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //去掉信息栏
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(setLayoutId());
         ButterKnife.bind(this);
         MTApplication.getInstance().onCreateActivity(this);
@@ -72,35 +82,41 @@ public abstract class MTActivity extends AppCompatActivity {
 
     /**
      * 自动连接wifi
+     *
      * @param wifiName
      * @param wifiPsw
      */
-    public void autoConnectWifi(String wifiName,String wifiPsw){
+    public void autoConnectWifi(String wifiName, String wifiPsw) {
         EventBus.getDefault().post(new WifiRequest(wifiName, wifiPsw));
     }
 
     /**
      * wifi连接成功的监听事件
+     *
      * @param res
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onWifiResponse(WifiResponse res) {
-        connectWifiSuccess(res);
+        if (res.getIsConnected()) {
+            connectWifiSuccess(res);
+        }
     }
 
     /**
      * 连接wifi成功  界面重写继续连接socket
+     *
      * @param res
      */
-    protected  void connectWifiSuccess(WifiResponse res){
+    protected void connectWifiSuccess(WifiResponse res) {
 
     }
 
     /**
      * 自动连接socket
+     *
      * @param serverip
      */
-    public void  autoConnectSocket(String serverip){
+    public void autoConnectSocket(String serverip) {
         //连上机器wifi-连接socket
         Clock.create(this).interval(500).count(1).onCompleteOnUI(new Runnable() {
             @Override
@@ -112,6 +128,7 @@ public abstract class MTActivity extends AppCompatActivity {
 
     /**
      * 注册链接socket的事件
+     *
      * @param res
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -120,13 +137,16 @@ public abstract class MTActivity extends AppCompatActivity {
             connectSocketSuccess(res);
         }
     }
+
     /**
-     * 连接Socket成功  界面重写继续连接socket
+     * 连接Socket成功  界面重写处理其他逻辑
+     *
      * @param res
      */
-    protected  void connectSocketSuccess(NetResponse res){
+    protected void connectSocketSuccess(NetResponse res) {
 
     }
+
     /**
      * 注册监听Socket发送的事件
      *
@@ -134,6 +154,30 @@ public abstract class MTActivity extends AppCompatActivity {
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSocketResponse(SocketResonse res) {
+        /**
+         * 强制退出
+         */
+        if (res.getProtocol() == KICK_OUT_RES) {
+            //如果在登录界面不作处理
+            if (!(MTApplication.getInstance().getCurrentActivity() instanceof LoginActivity)) {
+                AlertDialog.Builder bd = new AlertDialog.Builder(getContext());
+                bd.setTitle("警告");
+                bd.setMessage(res.getMsg() + ",您将返回登录页面!");
+                bd.setCancelable(false);
+                bd.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //清空登录信息
+                        CacheTool.setCurrentLoginResponse(null);
+                        //跳转
+                        MTApplication.getInstance().onFinishAllActivities();
+                        getContext().startActivity(new Intent(getContext(), LoginActivity.class));
+                    }
+                });
+                bd.show();
+            }
+            return;
+        }
         int[] list = listenProtocols();
         for (int protocol : list) {
             if (protocol == res.getProtocol()) {
@@ -247,6 +291,7 @@ public abstract class MTActivity extends AppCompatActivity {
     protected void initMVp() {
 
     }
+
     /**
      * 更新用戶信息（重写方法即可更新数据）
      *

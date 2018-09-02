@@ -90,6 +90,8 @@ public class LinkVideoCore  implements Renderer
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) 
 	{
+		//
+		gl.glRotatef(180, 0f, 0.2f, 0f);
 		nativeChangeView(width, height);
 	}
 	

@@ -2,17 +2,20 @@ package com.szpcqy.fisher.ui.login;
 
 import android.content.Intent;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.jzk.utilslibrary.LogUitls;
 import com.szpcqy.fisher.R;
+import com.szpcqy.fisher.data.fish.FishJoinSlotRequest;
 import com.szpcqy.fisher.data.login.LoginRequest;
 import com.szpcqy.fisher.data.login.LoginResponse;
-import com.szpcqy.fisher.event.pair.NetRequest;
 import com.szpcqy.fisher.event.pair.NetResponse;
+import com.szpcqy.fisher.event.pair.SocketResonse;
 import com.szpcqy.fisher.event.pair.WifiRequest;
 import com.szpcqy.fisher.event.pair.WifiResponse;
 import com.szpcqy.fisher.mt.MTDialog;
@@ -21,17 +24,17 @@ import com.szpcqy.fisher.mt.MTMvpActivity;
 import com.szpcqy.fisher.net.Gateway;
 import com.szpcqy.fisher.net.SocketProtocol;
 import com.szpcqy.fisher.tool.CacheTool;
-import com.szpcqy.fisher.tool.Clock;
+import com.szpcqy.fisher.ui.fish.play.FishPlayActivity;
 import com.szpcqy.fisher.ui.game.GameSelectActivity;
 import com.szpcqy.fisher.utils.ToastUtils;
 import com.szpcqy.fisher.view.MTImageView;
+import com.szpcqy.fisher.view.RegistDialog;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 
 /**
  * 登录的界面
@@ -63,7 +66,8 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
     @Override
     public int[] listenProtocols() {
         return new int[]{
-                SocketProtocol.LOGIN_RES
+                SocketProtocol.LOGIN_RES,
+                SocketProtocol.JOIN_SLOT_RES
         };
     }
 
@@ -112,6 +116,7 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_return:
+                onBackPressed();
                 break;
             case R.id.iv_set:
                 break;
@@ -134,6 +139,12 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
             case R.id.tv_forget_psw:
                 break;
             case R.id.tv_regist:
+                new RegistDialog(this, new RegistDialog.RegistListener() {
+                    @Override
+                    public void commitRegist(String user, String psw, String repeatPsw, String tel, String question, String answer) {
+                        // TODO: 2018/9/1 注册的事件
+                    }
+                }).show();
                 break;
             default:
                 break;
@@ -142,6 +153,7 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
 
     @Override
     public void loginSuccess(LoginResponse response) {
+        LogUitls.d("登录的信息--->", response.toString());
         /**
          * 设置当前登录的信息
          */
@@ -158,9 +170,17 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
 
             @Override
             public void onDismiss(MTDialog.MTDialogContent dialog) {
-                Intent it = new Intent(getContext(), GameSelectActivity.class);
-                startActivity(it);
-                finish();
+                /**
+                 * 是否是断线重连的状态
+                 */
+                if (null != response.getDeviceVO() && null != response.getSlotVO()) {
+                    LoginResponse.DeviceVOBean deviceVO = response.getDeviceVO();
+                    autoConnectWifi(deviceVO.getDevicessid(), deviceVO.getDevicesspw());
+                } else {
+                    Intent it = new Intent(getContext(), GameSelectActivity.class);
+                    startActivity(it);
+                    finish();
+                }
             }
         });
     }
@@ -172,25 +192,94 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
     }
 
     @Override
+    public void joinSlotFail(String msg) {
+        dia.close();
+        Toasty.warning(getContext(), msg).show();
+    }
+
+    @Override
+    public void joinSlotSuccess(SocketResonse res) {
+        dia.close();
+        Intent it = new Intent(getContext(), FishPlayActivity.class);
+        LoginResponse currentLoginResponse = CacheTool.getCurrentLoginResponse();
+        LoginResponse.DeviceVOBean deviceVO = currentLoginResponse.getDeviceVO();
+        int currentSlotSelectPosition=1;
+        String userId=CacheTool.getCurrentId();
+        if(null!=deviceVO&&deviceVO.getSlot1().equals(userId)){
+            currentSlotSelectPosition=1;
+        }
+        if(null!=deviceVO&&deviceVO.getSlot2().equals(userId)){
+            currentSlotSelectPosition=2;
+        }
+        if(null!=deviceVO&&deviceVO.getSlot3().equals(userId)){
+            currentSlotSelectPosition=3;
+        }
+        if(null!=deviceVO&&deviceVO.getSlot4().equals(userId)){
+            currentSlotSelectPosition=4;
+        }
+        if(null!=deviceVO&&deviceVO.getSlot5().equals(userId)){
+            currentSlotSelectPosition=5;
+        }
+        if(null!=deviceVO&&deviceVO.getSlot6().equals(userId)){
+            currentSlotSelectPosition=6;
+        }
+        if(null!=deviceVO&&deviceVO.getSlot7().equals(userId)){
+            currentSlotSelectPosition=7;
+        }
+        if(null!=deviceVO&&deviceVO.getSlot8().equals(userId)){
+            currentSlotSelectPosition=8;
+        }
+        it.putExtra(FishPlayActivity.RATIO_COIN_MULTIPLY, deviceVO.getRatiocoinscore());
+        it.putExtra(FishPlayActivity.SLOT_POSITION, currentSlotSelectPosition);
+        it.putExtra(FishPlayActivity.DESK_TYPE,deviceVO.getDevicetype());
+        startActivity(it);
+    }
+
+    @Override
     public void showProgressDialog(int pro) {
-        dia = MTLightbox.show(getContext(), MTLightbox.IconType.PROGRESS, "登录中", false);
+        if (pro == SocketProtocol.JOIN_SLOT_REQ) {
+            dia = MTLightbox.show(getContext(), MTLightbox.IconType.PROGRESS, "加入座位中", false);
+        } else {
+            dia = MTLightbox.show(getContext(), MTLightbox.IconType.PROGRESS, "登录中", false);
+        }
     }
 
     @Override
     public void dismisProgressDialog() {
-
     }
+
     @Override
     protected void connectWifiSuccess(WifiResponse res) {
         super.connectWifiSuccess(res);
-        autoConnectSocket(Gateway.SERVER_IP);
+        /**
+         *  1、当缓存的用户信息不为空
+         *  2、当缓存的用户信息中设备信息不为空
+         *  3、用户缓存的设备信息中的wifi名称和现在连接wifi名称一致
+         *    即为断线重连。需要连接缓存中socket的地址
+         */
+        if (null != CacheTool.getCurrentLoginResponse()
+                && null != CacheTool.getCurrentLoginResponse().getDeviceVO()
+                && res.getSsid().equals(CacheTool.getCurrentLoginResponse().getDeviceVO().getDevicessid())) {
+            autoConnectSocket(CacheTool.getCurrentLoginResponse().getDeviceVO().getServerip());
+        } else {
+            autoConnectSocket(Gateway.SERVER_IP);
+        }
     }
 
     @Override
     protected void connectSocketSuccess(NetResponse res) {
         super.connectSocketSuccess(res);
-        if (res.getIsConnected() && res.getIp().equals(Gateway.SERVER_IP)) {
-            confirmBtn.setEnabled(true);
+        if (res.getIsConnected()) {
+            if (res.getIp().equals(Gateway.SERVER_IP) && null == CacheTool.getCurrentLoginResponse()) {
+                confirmBtn.setEnabled(true);
+            } else {
+                //自动跳转游戏机并且 加入控制位
+                LoginResponse currentLoginResponse = CacheTool.getCurrentLoginResponse();
+                FishJoinSlotRequest request = new FishJoinSlotRequest(SocketProtocol.JOIN_SLOT_REQ
+                        , currentLoginResponse.getDeviceVO().getId()
+                        , currentLoginResponse.getSlotVO().getId());
+                getPresenter().joinSlot(request);
+            }
         }
     }
 }

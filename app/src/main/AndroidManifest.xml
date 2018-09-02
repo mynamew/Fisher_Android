@@ -43,6 +43,7 @@
         <activity
             android:name=".ui.login.LoginActivity"
             android:screenOrientation="landscape"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden">
         </activity>
 
@@ -51,18 +52,22 @@
 
         <activity
             android:name=".ui.fish.FishHallActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="landscape">
         </activity>
         <activity
             android:name=".ui.game.GameSelectActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="landscape">
         </activity>
         <activity
             android:name=".ui.fish.desk.FishDeskActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="landscape">
         </activity>
         <activity
             android:name=".ui.fish.play.FishPlayActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="landscape">
         </activity>
     </application>

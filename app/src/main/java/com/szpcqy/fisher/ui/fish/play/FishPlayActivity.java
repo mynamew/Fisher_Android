@@ -2,6 +2,7 @@ package com.szpcqy.fisher.ui.fish.play;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,6 +20,8 @@ import com.szpcqy.fisher.mt.MTMvpActivity;
 import com.szpcqy.fisher.net.SocketProtocol;
 import com.szpcqy.fisher.tool.CacheTool;
 import com.szpcqy.fisher.tool.Clock;
+import com.szpcqy.fisher.ui.fish.desk.FishDeskActivity;
+import com.szpcqy.fisher.utils.ActivityUtils;
 import com.szpcqy.fisher.vcard.VideoCard;
 import com.szpcqy.fisher.view.AddCoinDialog;
 
@@ -29,6 +32,9 @@ import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 
+import static com.szpcqy.fisher.ui.fish.desk.FishDeskActivity.DESKID;
+import static com.szpcqy.fisher.ui.fish.desk.FishDeskActivity.DES_TYPE;
+
 /**
  * 捕鱼的界面  播放视频流
  *
@@ -36,7 +42,7 @@ import io.github.controlwear.virtual.joystick.android.JoystickView;
  * create at: 2018/8/27 17:26
  */
 public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresenter> implements FishPlayView {
-     //金币数
+    //金币数
     static public final String RATIO_COIN_MULTIPLY = "RATIO_COIN_MULTIPLY";
     //位置的bundle
     static public final String SLOT_POSITION = "SLOT_POSITION";
@@ -74,6 +80,9 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     private int isFireTouch = 0;
 
     private Clock mClockPlay;
+    //桌位的信息
+    private String desId;
+    private int deviceType;
 
     @Override
     public int setLayoutId() {
@@ -140,13 +149,16 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
         findViewById(R.id.ll_bottom).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.ll_content).setRotation(180);
+                LogUitls.e("翻转！！！！！");
+                videoPlay.setRotation(180);
             }
         });
     }
 
     @Override
     public void initData() {
+        desId = getIntent().getStringExtra(DESKID);
+        deviceType = getIntent().getIntExtra(DES_TYPE, 1);
         //分数
         Double ratiocoinscore = super.getIntent().getDoubleExtra(RATIO_COIN_MULTIPLY, 1);
         tvGoldQty.setText(String.valueOf(CacheTool.getCurentGold()));
@@ -286,13 +298,23 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     public void addCoinSuccess(LoginResponse loginResponse) {
         dia.close();
         CacheTool.setCurrentLoginResponse(loginResponse);
-        tvGoldQty.setText(String.valueOf(loginResponse.getGold()));
+        tvGoldQty.setText(String.valueOf(loginResponse.getUserVO().getGold()));
     }
 
     @Override
     public void quitSlotSuccess() {
         Toasty.success(getApplicationContext(), "您已退出游戏，若有分数未退，系统将自动退还到您的账户").show();
-        finish();
+        /**
+         * 如果Activity栈中有桌位的Activity即FishDeskActivity 则直接返回否则执行跳转操作
+         */
+        if (ActivityUtils.isExsitActivity(FishDeskActivity.class, this)) {
+            finish();
+        } else {
+            Intent it = new Intent(this, FishDeskActivity.class);
+            it.putExtra(DESKID, desId);
+            it.putExtra(DES_TYPE, deviceType);
+            startActivity(it);
+        }
     }
 
     @Override
@@ -318,6 +340,6 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     @Override
     protected void updateUserInfo(LoginResponse userinfo) {
         super.updateUserInfo(userinfo);
-        tvGoldQty.setText(String.valueOf(userinfo.getGold()));
+        tvGoldQty.setText(String.valueOf(userinfo.getUserVO().getGold()));
     }
 }

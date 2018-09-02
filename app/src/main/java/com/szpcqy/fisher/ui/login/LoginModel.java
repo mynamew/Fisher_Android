@@ -1,5 +1,6 @@
 package com.szpcqy.fisher.ui.login;
 
+import com.szpcqy.fisher.data.fish.FishJoinSlotRequest;
 import com.szpcqy.fisher.data.login.LoginRequest;
 import com.szpcqy.fisher.event.pair.CommonRequest;
 
@@ -17,5 +18,12 @@ public class LoginModel {
      */
     public void LoginRequest(CommonRequest<LoginRequest> t) {
         EventBus.getDefault().post(t);
+    }
+    /**
+     * 加入座位
+     * @param request
+     */
+    public void joinSlot(FishJoinSlotRequest request) {
+        EventBus.getDefault().post(new CommonRequest<FishJoinSlotRequest>(request));
     }
 }
