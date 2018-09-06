@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.szpcqy.fisher.event.pair.CommonRequest;
 import com.szpcqy.fisher.event.pair.NetRequest;
 import com.szpcqy.fisher.event.pair.NetResponse;
+import com.szpcqy.fisher.event.pair.SocketCloseRequest;
 import com.szpcqy.fisher.event.pair.SocketRequest;
 import com.szpcqy.fisher.event.pair.SocketResonse;
 import com.szpcqy.fisher.event.pair.WifiRequest;
@@ -40,7 +41,6 @@ public class SocketServce extends Service {
             m_socket.close();
         }
     }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onNetRequest(final NetRequest req) {
         if (req.getType() == NetRequest.RequestType.DISCONNECT) {

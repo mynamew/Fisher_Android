@@ -19,7 +19,7 @@ public class CacheTool {
     static public void setCurrentLoginResponse(LoginResponse res) {
         response = res;
         if (response != null) {
-            EventBus.getDefault().post(new LoginResponse());
+            EventBus.getDefault().post(res);
         }
     }
 

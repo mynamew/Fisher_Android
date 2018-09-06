@@ -13,14 +13,15 @@ import com.szpcqy.fisher.data.fish.FishJoinSlotRequest;
 import com.szpcqy.fisher.data.login.LoginRequest;
 import com.szpcqy.fisher.data.login.LoginResponse;
 import com.szpcqy.fisher.event.pair.NetResponse;
+import com.szpcqy.fisher.event.pair.SocketCloseRequest;
 import com.szpcqy.fisher.event.pair.SocketResonse;
-import com.szpcqy.fisher.event.pair.WifiRequest;
 import com.szpcqy.fisher.event.pair.WifiResponse;
 import com.szpcqy.fisher.mt.MTActivity;
 import com.szpcqy.fisher.mt.MTApplication;
 import com.szpcqy.fisher.mt.MTDialog;
 import com.szpcqy.fisher.mt.MTLightbox;
 import com.szpcqy.fisher.mt.MTMvpActivity;
+import com.szpcqy.fisher.mt.MTWebsocket;
 import com.szpcqy.fisher.net.SocketProtocol;
 import com.szpcqy.fisher.net.vo.GameSLotVO;
 import com.szpcqy.fisher.tool.CacheTool;
@@ -31,10 +32,9 @@ import com.szpcqy.fisher.ui.fragment.DeskEightFragment;
 import com.szpcqy.fisher.ui.fragment.DeskSixFragment;
 import com.szpcqy.fisher.ui.login.LoginActivity;
 import com.szpcqy.fisher.utils.ActivityUtils;
+import com.szpcqy.fisher.utils.WifiUtils;
 
 import org.greenrobot.eventbus.EventBus;
-
-import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 
@@ -47,15 +47,15 @@ import es.dmoral.toasty.Toasty;
 public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresenter> implements FishDeskView {
     static public final String DESKID = "DESKID";
     static public final String DES_TYPE = "DES_TYPE";
+    static public final String DES_RELOG = "DES_RELOG";
 
     private DeskBaseFragment fragment;
     private MTDialog.MTDialogContent dia;
 
     private FishGetAllDeskResponse fishGetAllDeskResponse = null;
-    //桌号
-    private String desId;
     //选择的座位号，用于翻转
-    private int currentSlotSelectPosition=0;
+    private int currentSlotSelectPosition = 0;
+
     @Override
     public int setLayoutId() {
         return R.layout.activity_fish_desk;
@@ -68,12 +68,20 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
 
     @Override
     public void initData() {
-        desId = getIntent().getStringExtra(DESKID);
-        fishGetAllDeskResponse= CacheTool.getCurrentFishDesk();
+        fishGetAllDeskResponse = CacheTool.getCurrentFishDesk();
+        boolean isReConnectPlay=getIntent().getBooleanExtra(DES_RELOG,false);
         /**
-         * 自动连接wifi
+         * 是否是刚好在Ip
          */
-        autoConnectWifi(fishGetAllDeskResponse.getDevicessid(), fishGetAllDeskResponse.getDevicesspw());
+        if (!WifiUtils.getWifiRouteIPAddress(FishDeskActivity.this).equals(fishGetAllDeskResponse.getServerip())&&!isReConnectPlay) {
+            /**
+             * 自动连接wifi
+             */
+            autoConnectWifi(fishGetAllDeskResponse.getDevicessid(), fishGetAllDeskResponse.getDevicesspw());
+        }else {
+            FishGetAllDeskRequest request = new FishGetAllDeskRequest(SocketProtocol.GET_DESK_SINGLE_REQ, fishGetAllDeskResponse.getId());
+            getPresenter().getAllDesk(request);
+        }
         /**
          * 不同的桌子
          */
@@ -112,10 +120,10 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
                         return;
                     }
                     //设置选择的座位号
-                    currentSlotSelectPosition=pos;
+                    currentSlotSelectPosition = pos;
                     //发起请求
                     FishJoinSlotRequest request = new FishJoinSlotRequest(SocketProtocol.JOIN_SLOT_REQ,
-                            desId, fishGetAllDeskResponse.getSlot(pos).getId());
+                            fishGetAllDeskResponse.getId(), fishGetAllDeskResponse.getSlot(pos).getId());
                     getPresenter().joinSlot(request);
                 }
             }
@@ -193,7 +201,7 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
         MTLightbox.update(getContext(), dia, MTLightbox.IconType.SUCCESS, "登录成功");
         dia.close();
 
-        FishGetAllDeskRequest request = new FishGetAllDeskRequest(SocketProtocol.GET_DESK_SINGLE_REQ, desId);
+        FishGetAllDeskRequest request = new FishGetAllDeskRequest(SocketProtocol.GET_DESK_SINGLE_REQ, fishGetAllDeskResponse.getId());
         getPresenter().getAllDesk(request);
     }
 
@@ -276,6 +284,7 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
     public void joinSlotFail(String msg) {
         Toasty.warning(getContext(), msg).show();
     }
+
     @Override
     public void joinSlotSuccess(SocketResonse res) {
         MTLightbox.update(getContext(), dia, MTLightbox.IconType.SUCCESS, "加入座位成功", 1000);
@@ -297,6 +306,14 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
         } else {
             Intent it = new Intent(this, FishHallActivity.class);
             startActivity(it);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(null!=dia){
+            dia.close();
         }
     }
 }

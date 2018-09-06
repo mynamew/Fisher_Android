@@ -37,7 +37,6 @@ public class MyAdapter extends FragmentPagerAdapter {
                 CacheTool.setCurrentFishDesk(frag.getDeskFishVO());
                 // TODO: 2018/8/26 跳转到桌位
                 Intent it = new Intent(mContext, FishDeskActivity.class);
-                it.putExtra(FishDeskActivity.DESKID, deskId);
                 it.putExtra(FishDeskActivity.DES_TYPE, devicetype);
                 mContext.startActivity(it);
             }
@@ -47,7 +46,6 @@ public class MyAdapter extends FragmentPagerAdapter {
                 CacheTool.setCurrentFishDesk(frag.getDeskFishVO());
                 // TODO: 2018/8/26 跳转到桌位
                 Intent it = new Intent(mContext, FishDeskActivity.class);
-                it.putExtra(FishDeskActivity.DESKID, deskId);
                 it.putExtra(FishDeskActivity.DES_TYPE, devicetype);
                 mContext.startActivity(it);
             }

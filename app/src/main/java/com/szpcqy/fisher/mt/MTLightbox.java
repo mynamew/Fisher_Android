@@ -32,7 +32,12 @@ public class MTLightbox {
             public void run() {
                 pd.close();
                 if (callback != null) {
-                    callback.onDismiss(pd);
+                    MTApplication.getInstance().getCurrentActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onDismiss(pd);
+                        }
+                    });
                 }
             }
         }, dismissAfter);
@@ -72,7 +77,12 @@ public class MTLightbox {
                 public void run() {
                     pd.close();
                     if (callback != null) {
-                        callback.onDismiss(pd);
+                       MTApplication.getInstance().getCurrentActivity().runOnUiThread(new Runnable() {
+                           @Override
+                           public void run() {
+                               callback.onDismiss(pd);
+                           }
+                       });
                     }
                 }
             }, dismissAfter);

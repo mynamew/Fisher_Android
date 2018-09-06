@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.jzk.utilslibrary.LogUitls;
 import com.szpcqy.fisher.R;
+import com.szpcqy.fisher.data.fish.FishGetAllDeskResponse;
 import com.szpcqy.fisher.data.fish.FishJoinSlotRequest;
 import com.szpcqy.fisher.data.login.LoginRequest;
 import com.szpcqy.fisher.data.login.LoginResponse;
@@ -23,6 +24,7 @@ import com.szpcqy.fisher.mt.MTMvpActivity;
 import com.szpcqy.fisher.net.Gateway;
 import com.szpcqy.fisher.net.SocketProtocol;
 import com.szpcqy.fisher.tool.CacheTool;
+import com.szpcqy.fisher.ui.fish.desk.FishDeskActivity;
 import com.szpcqy.fisher.ui.fish.play.FishPlayActivity;
 import com.szpcqy.fisher.ui.game.GameSelectActivity;
 import com.szpcqy.fisher.utils.ToastUtils;
@@ -83,7 +85,7 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
 
     @Override
     public void initData() {
-        LogUitls.e("当前的ip--->",WifiUtils.getWifiRouteIPAddress(this));
+        LogUitls.e("当前的ip--->", WifiUtils.getWifiRouteIPAddress(this));
 
     }
 
@@ -179,7 +181,8 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
                      * 如果当前ip和socket的ip地址一样则直接加入控制位
                      */
                     if (WifiUtils.getWifiRouteIPAddress(LoginActivity.this).equals(response.getDeviceVO().getServerip())) {
-//                        MTLightbox.update(LoginActivity.this,dia, MTLightbox.IconType.PROGRESS,"加入座位中");
+                        dia = MTLightbox.show(getContext(), MTLightbox.IconType.PROGRESS, "加入座位中", false);
+
                         //自动跳转游戏机并且 加入控制位
                         LoginResponse currentLoginResponse = CacheTool.getCurrentLoginResponse();
                         FishJoinSlotRequest request = new FishJoinSlotRequest(SocketProtocol.JOIN_SLOT_REQ
@@ -189,7 +192,8 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
                         return;
                     }
                     if (null != CacheTool.getCurrentLoginResponse().getDeviceVO() && null != CacheTool.getCurrentLoginResponse().getSlotVO()) {
-//                        MTLightbox.update(LoginActivity.this,dia, MTLightbox.IconType.PROGRESS,"加入座位中");
+                        dia = MTLightbox.show(getContext(), MTLightbox.IconType.PROGRESS, "加入座位中", false);
+
                         //自动跳转游戏机并且 加入控制位
                         LoginResponse currentLoginResponse = CacheTool.getCurrentLoginResponse();
                         FishJoinSlotRequest request = new FishJoinSlotRequest(SocketProtocol.JOIN_SLOT_REQ
@@ -197,10 +201,12 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
                                 , currentLoginResponse.getSlotVO().getId());
                         getPresenter().joinSlot(request);
                     } else {
-                        LoginResponse.DeviceVOBean deviceVO = response.getDeviceVO();
+                        FishGetAllDeskResponse deviceVO = response.getDeviceVO();
                         autoConnectWifi(deviceVO.getDevicessid(), deviceVO.getDevicesspw());
                     }
-                } else {
+                } else
+
+                {
                     Intent it = new Intent(getContext(), GameSelectActivity.class);
                     startActivity(it);
                     finish();
@@ -226,7 +232,7 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
         dia.close();
         Intent it = new Intent(getContext(), FishPlayActivity.class);
         LoginResponse currentLoginResponse = CacheTool.getCurrentLoginResponse();
-        LoginResponse.DeviceVOBean deviceVO = currentLoginResponse.getDeviceVO();
+        FishGetAllDeskResponse deviceVO = currentLoginResponse.getDeviceVO();
         int currentSlotSelectPosition = 1;
         String userId = CacheTool.getCurrentId();
         if (null != deviceVO && deviceVO.getSlot1().equals(userId)) {
@@ -255,7 +261,9 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
         }
         it.putExtra(FishPlayActivity.RATIO_COIN_MULTIPLY, deviceVO.getRatiocoinscore());
         it.putExtra(FishPlayActivity.SLOT_POSITION, currentSlotSelectPosition);
+        it.putExtra(FishDeskActivity.DESKID, deviceVO.getId());
         it.putExtra(FishPlayActivity.DESK_TYPE, deviceVO.getDevicetype());
+        CacheTool.setCurrentFishDesk(deviceVO);
         /**
          * 清空重连信息
          */
@@ -302,10 +310,15 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
                 confirmBtn.setEnabled(true);
             } else {
                 /**
-                 * 登录的请求
+                 * 当设备信息不为空为重连
                  */
-                getPresenter().login(new LoginRequest(SocketProtocol.LOGIN_REQ, etUsername.getText().toString().trim()
-                        , etPassword.getText().toString().trim()));
+                if (null != CacheTool.getCurrentLoginResponse().getDeviceVO()) {
+                    /**
+                     * 登录的请求
+                     */
+                    getPresenter().login(new LoginRequest(SocketProtocol.LOGIN_REQ, etUsername.getText().toString().trim()
+                            , etPassword.getText().toString().trim()));
+                }
             }
         }
     }

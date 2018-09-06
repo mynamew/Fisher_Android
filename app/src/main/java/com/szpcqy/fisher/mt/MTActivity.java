@@ -33,9 +33,11 @@ import butterknife.ButterKnife;
 
 import static com.szpcqy.fisher.net.SocketProtocol.KICK_OUT_RES;
 
-/**
- * Created by Master on 2017/10/31.
- */
+/** 
+  * MTActivity
+  * @author   jzk
+  * create at: 2018/9/5 22:12
+  */  
 
 public abstract class MTActivity extends AppCompatActivity {
 
@@ -133,8 +135,30 @@ public abstract class MTActivity extends AppCompatActivity {
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onNetResponse(NetResponse res) {
+        /**
+         * 连接wifi成功 则连接socket
+         */
         if (res.getIsConnected()) {
             connectSocketSuccess(res);
+        }
+        /**
+         * 设备断开
+         */
+        else if(!res.getIsConnected()&&res.getIsRemote()){
+            //被远程关闭，退出登录
+            final AppCompatActivity atx = MTApplication.getInstance().getCurrentActivity();
+            android.app.AlertDialog.Builder bd = new android.app.AlertDialog.Builder(atx);
+            bd.setTitle("警告");
+            bd.setMessage("您与设备之间已失联，将退出到登录界面!");
+            bd.setCancelable(false);
+            bd.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    MTApplication.getInstance().onFinishAllActivities();
+                    atx.startActivity(new Intent(atx, LoginActivity.class));
+                }
+            });
+            bd.show();
         }
     }
 

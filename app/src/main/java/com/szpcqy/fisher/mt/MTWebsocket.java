@@ -96,9 +96,12 @@ public class MTWebsocket {
 
     /**
      * 获取是否正在连接
+     *
      * @return
      */
     public boolean isConnectiong() {
         return m_socket.isConnecting();
     }
+
+
 }

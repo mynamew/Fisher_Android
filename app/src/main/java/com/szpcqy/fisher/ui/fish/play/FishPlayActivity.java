@@ -33,6 +33,7 @@ import es.dmoral.toasty.Toasty;
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 
 import static com.szpcqy.fisher.ui.fish.desk.FishDeskActivity.DESKID;
+import static com.szpcqy.fisher.ui.fish.desk.FishDeskActivity.DES_RELOG;
 import static com.szpcqy.fisher.ui.fish.desk.FishDeskActivity.DES_TYPE;
 
 /**
@@ -68,7 +69,7 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
      * 左边菜单的属性
      */
     private float fromPosition = 0;
-    private float toPosition = -130;
+    private float toPosition = -200;
     private boolean isShowLeftMenu = false;
     /**
      * 方向 开炮
@@ -80,8 +81,6 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     private int isFireTouch = 0;
 
     private Clock mClockPlay;
-    //桌位的信息
-    private String desId;
     private int deviceType;
 
     @Override
@@ -157,7 +156,6 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
 
     @Override
     public void initData() {
-        desId = getIntent().getStringExtra(DESKID);
         deviceType = getIntent().getIntExtra(DES_TYPE, 1);
         //分数
         Double ratiocoinscore = super.getIntent().getDoubleExtra(RATIO_COIN_MULTIPLY, 1);
@@ -311,9 +309,11 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
             finish();
         } else {
             Intent it = new Intent(this, FishDeskActivity.class);
-            it.putExtra(DESKID, desId);
+            it.putExtra(DESKID, CacheTool.getCurrentFishDesk().getId());
             it.putExtra(DES_TYPE, deviceType);
+            it.putExtra(DES_RELOG, true);
             startActivity(it);
+            finish();
         }
     }
 
@@ -339,7 +339,6 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
      */
     @Override
     protected void updateUserInfo(LoginResponse userinfo) {
-        super.updateUserInfo(userinfo);
         tvGoldQty.setText(String.valueOf(userinfo.getUserVO().getGold()));
     }
 }
