@@ -3,11 +3,13 @@ package com.szpcqy.fisher.tool;
 
 import com.szpcqy.fisher.data.fish.FishGetAllDeskResponse;
 import com.szpcqy.fisher.data.login.LoginResponse;
+import com.szpcqy.fisher.data.login.UserVo;
 
 import org.greenrobot.eventbus.EventBus;
 
 public class CacheTool {
     static public LoginResponse response = null;
+    static public UserVo userVo = null;
     static public FishGetAllDeskResponse currentFishDesk = null;
     static public String psw = "";
 

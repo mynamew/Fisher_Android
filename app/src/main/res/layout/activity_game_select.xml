@@ -8,52 +8,7 @@
     android:background="@mipmap/game_select_bg"
     tools:context=".ui.game.GameSelectActivity">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/iv_head"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="10dp"
-        android:src="@mipmap/ic_launcher"
-        app:civ_border_color="#ffd581"
-        app:civ_border_width="1dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/tv_gold_qty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="165dp"
-        android:layout_marginTop="11dp"
-        android:background="@mipmap/game_select_gold_bg"
-        android:gravity="center_vertical"
-        android:paddingLeft="40dp"
-        android:text="0"
-        android:textColor="#fff"
-        android:textSize="16sp"
-        app:layout_constraintLeft_toRightOf="@id/iv_head"
-        app:layout_constraintTop_toTopOf="parent">
-    </TextView>
-
-    <ImageView
-        android:id="@+id/iv_return"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginRight="7dp"
-        android:layout_marginTop="5dp"
-        android:src="@mipmap/login_return"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <ImageView
-        android:id="@+id/iv_set"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@mipmap/login_set"
-        app:layout_constraintRight_toLeftOf="@+id/iv_return"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/iv_return"/>
+    <include layout="@layout/header_top"/>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="wrap_content"
@@ -72,18 +27,18 @@
 
         <ImageView
             android:id="@+id/iv_fish"
-            android:layout_marginLeft="140dp"
-            app:layout_constraintLeft_toLeftOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@mipmap/game_select_fish"/>
+            android:layout_marginLeft="140dp"
+            android:src="@mipmap/game_select_fish"
+            app:layout_constraintLeft_toLeftOf="parent"/>
 
         <ImageView
-            android:layout_marginLeft="355dp"
-            app:layout_constraintLeft_toLeftOf="parent"
             android:id="@+id/iv_relax"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@mipmap/game_select_relax"/>
+            android:layout_marginLeft="355dp"
+            android:src="@mipmap/game_select_relax"
+            app:layout_constraintLeft_toLeftOf="parent"/>
     </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

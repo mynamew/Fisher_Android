@@ -3,8 +3,12 @@ package com.szpcqy.fisher.ui.fish;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.jzk.utilslibrary.LogUitls;
 import com.szpcqy.fisher.R;
@@ -23,14 +27,15 @@ import com.szpcqy.fisher.ui.fragment.DeskEightFragment;
 import com.szpcqy.fisher.ui.fragment.DeskSixFragment;
 import com.szpcqy.fisher.ui.login.LoginActivity;
 import com.szpcqy.fisher.utils.ToastUtils;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
+import com.szpcqy.fisher.view.MTImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * 捕鱼大厅
@@ -42,6 +47,30 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
     MTDialog.MTDialogContent dia;
     @BindView(R.id.vp_fish_hall)
     ViewPager vpFishHall;
+    @BindView(R.id.tv_desk_num)
+    TextView tvDeskNum;
+    @BindView(R.id.tv_min_carry)
+    TextView tvMinCarry;
+    @BindView(R.id.tv_max_fire)
+    TextView tvMaxFire;
+    @BindView(R.id.tv_coin_fire)
+    TextView tvCoinFire;
+    @BindView(R.id.tv_min_fire)
+    TextView tvMinFire;
+    @BindView(R.id.iv_head)
+    CircleImageView ivHead;
+    @BindView(R.id.tv_gold_qty)
+    TextView tvGoldQty;
+    @BindView(R.id.tv_current_desk)
+    TextView tvCurrentDesk;
+    @BindView(R.id.iv_return)
+    ImageView ivReturn;
+    @BindView(R.id.iv_set)
+    ImageView ivSet;
+    @BindView(R.id.leftImg)
+    MTImageView leftImg;
+    @BindView(R.id.rightImg)
+    MTImageView rightImg;
 
 
     private ArrayList<DeskBaseFragment> mDeskFragments;
@@ -49,6 +78,7 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
 
 
     private ArrayList<FishGetAllDeskResponse> mFishDesks;
+
     @Override
     public FishHallPresenter createPresenter() {
         return new FishHallPresenter(this);
@@ -95,17 +125,20 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
 
     @Override
     public void initView() {
-
+        ivSet.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void initData() {
         getPresenter().getAllDesk();
-
+        //设置当前的金币数
+        setTextViewContent(tvGoldQty,CacheTool.getCurentGold());
         mFishDesks = new ArrayList<>();
         mDeskFragments = new ArrayList<>();
 
-        mAdapter = new MyAdapter(getSupportFragmentManager(),mDeskFragments,this);
+        mAdapter = new MyAdapter(getSupportFragmentManager(), mDeskFragments, this);
+        int curPost = mDeskFragments.size() == 0 ? 0 : 1;
+        tvCurrentDesk.setText(curPost + " / " + mDeskFragments.size());
         vpFishHall.setAdapter(mAdapter);
         vpFishHall.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -115,8 +148,7 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
 
             @Override
             public void onPageSelected(int position) {
-//                m_curallTxt.setText((position + 1) + " / " + mDeskFragments.size());
-                // TODO: 2018/8/26  设置当前桌号
+                tvCurrentDesk.setText((position + 1) + " / " + mDeskFragments.size());
             }
 
             @Override
@@ -194,6 +226,8 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
     @Override
     public void coinOutSuccess(LoginResponse response) {
         CacheTool.setCurrentLoginResponse(response);
+        //设置当前的金币数
+        setTextViewContent(tvGoldQty,CacheTool.getCurentGold());
     }
 
     @Override
@@ -244,11 +278,47 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
 
     /**
      * 当用户信息发生变化是更新用户信息
+     *
      * @param userinfo
      */
     @Override
     protected void updateUserInfo(LoginResponse userinfo) {
         super.updateUserInfo(userinfo);
-        // TODO: 2018/9/1  更新用户的金币数，头像，昵称等
+        //设置当前的金币数
+        setTextViewContent(tvGoldQty,CacheTool.getCurentGold());
+    }
+
+    @OnClick({R.id.iv_return, R.id.leftImg, R.id.rightImg})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            /**
+             * 返回
+             */
+            case R.id.iv_return:
+                onBackPressed();
+                break;
+            /**
+             * 左滑
+             */
+            case R.id.leftImg:
+                int preview = vpFishHall.getCurrentItem() - 1;
+                if (preview < 0) {
+                    preview = 0;
+                }
+                vpFishHall.setCurrentItem(preview, true);
+                break;
+            /**
+             * 右滑
+             */
+            case R.id.rightImg:
+                int next = vpFishHall.getCurrentItem() + 1;
+                if (next >= mDeskFragments.size()) {
+                    next = mDeskFragments.size() - 1;
+                }
+                vpFishHall.setCurrentItem(next, true);
+                break;
+            default:
+                break;
+        }
     }
 }

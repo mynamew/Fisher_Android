@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                >
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
     <LinearLayout
+        android:id="@+id/ll_content"
         android:layout_width="500dp"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         android:background="@mipmap/add_coin_bg"
         android:orientation="vertical">
 
@@ -15,6 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="70dp"
             android:layout_marginStart="70dp"
+            android:gravity="center_horizontal"
             android:layout_marginTop="55dp"
             android:orientation="horizontal">
 
@@ -46,6 +52,7 @@
                 android:src="@mipmap/add_coin_add"/>
 
             <TextView
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="5dp"
@@ -55,6 +62,7 @@
                 android:textSize="14sp"/>
 
             <TextView
+                android:visibility="gone"
                 android:id="@+id/tv_current_score"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -171,4 +179,11 @@
             android:layout_marginTop="20dp"
             android:src="@mipmap/add_coin_ok"/>
     </LinearLayout>
-</RelativeLayout>
+    <ImageView
+        android:id="@+id/iv_close"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintTop_toTopOf="@id/ll_content"
+        app:layout_constraintRight_toRightOf="@id/ll_content"
+        android:layout_width="50dp"
+        android:layout_height="40dp"/>
+</android.support.constraint.ConstraintLayout>

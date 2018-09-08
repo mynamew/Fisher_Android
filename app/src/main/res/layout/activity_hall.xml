@@ -5,7 +5,6 @@
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent"
                                              tools:context=".ui.fish.FishHallActivity">
-
     <ImageView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -15,14 +14,191 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
-
     <android.support.v4.view.ViewPager
         android:id="@+id/vp_fish_hall"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="600dp"
+        android:layout_height="400dp"
+        android:layout_marginTop="100dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+
+    <!--底部的桌位信息-->
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="400dp"
+        android:layout_height="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/hall_panl_bg"/>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/cons_desk_num"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:src="@mipmap/hall_zhuohao"/>
+
+            <TextView
+                android:id="@+id/tv_desk_num"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="0号桌"
+                android:textColor="@color/colorWhite"
+                android:textSize="20dp"
+                android:textStyle="bold"/>
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/cons_min"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintLeft_toRightOf="@+id/cons_desk_num"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/hall_zxxd"/>
+
+            <TextView
+                android:id="@+id/tv_min_carry"
+                android:layout_width="60dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="40dp"
+                android:background="@mipmap/hall_fenzhi"
+                android:gravity="center"
+                android:text="100"
+                android:textColor="#f6c568"
+                app:layout_constraintLeft_toLeftOf="parent"/>
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/cons_max_fire"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            app:layout_constraintLeft_toRightOf="@+id/cons_min"
+            app:layout_constraintTop_toBottomOf="@+id/cons_min"
+            >
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/hall_zdpz"/>
+
+            <TextView
+                android:id="@+id/tv_max_fire"
+                android:layout_width="60dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="40dp"
+                android:background="@mipmap/hall_fenzhi"
+                android:gravity="center"
+                android:text="100"
+                android:textColor="#f6c568"
+                app:layout_constraintLeft_toLeftOf="parent"/>
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/cons_coin_score"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            app:layout_constraintLeft_toRightOf="@+id/cons_min"
+            app:layout_constraintTop_toTopOf="@+id/cons_min"
+            >
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/hall_yfbz"/>
+
+            <TextView
+                android:id="@+id/tv_coin_fire"
+                android:layout_width="60dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="40dp"
+                android:background="@mipmap/hall_fenzhi"
+                android:gravity="center"
+                android:text="100"
+                android:textColor="#f6c568"
+                app:layout_constraintLeft_toLeftOf="parent"/>
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/cons_min_fire"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            app:layout_constraintLeft_toRightOf="@+id/cons_desk_num"
+            app:layout_constraintTop_toBottomOf="@+id/cons_min"
+            >
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/hall_zxpz"/>
+
+            <TextView
+                android:id="@+id/tv_min_fire"
+                android:layout_width="60dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="40dp"
+                android:background="@mipmap/hall_fenzhi"
+                android:gravity="center"
+                android:text="100"
+                android:textColor="#f6c568"
+                app:layout_constraintLeft_toLeftOf="parent"/>
+        </android.support.constraint.ConstraintLayout>
+    </android.support.constraint.ConstraintLayout>
+    <include layout="@layout/header_top"/>
+    <com.szpcqy.fisher.view.MTImageView
+        android:id="@+id/leftImg"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:normalImg="@mipmap/hall_left_normal"
+        app:pressImg="@mipmap/hall_left_press" />
+
+    <com.szpcqy.fisher.view.MTImageView
+        android:id="@+id/rightImg"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:normalImg="@mipmap/hall_right_normal"
+        app:pressImg="@mipmap/hall_right_press" />
+    <TextView
+        android:id="@+id/tv_current_desk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text=""
+        android:textColor="#f9c967"
+        android:textSize="30sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

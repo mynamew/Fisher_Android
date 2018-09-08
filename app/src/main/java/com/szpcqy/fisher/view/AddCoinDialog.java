@@ -22,7 +22,7 @@ import java.util.ArrayList;
 public class AddCoinDialog extends MyDialog {
     private TextView tvAdd1, tvAdd5, tvAdd2, tvAdd10, tvAdd50, tvAdd20;
     private TextView tvInputScore, tvCurrentScore;
-    private ImageView ivAdd, ivSubstrace, ivCommit;
+    private ImageView ivAdd, ivClose, ivSubstrace, ivCommit;
     private ArrayList<TextView> addScores = new ArrayList<>();
     //当前点击要增加/减少的分数
     private int currentAddScore = 0;
@@ -70,6 +70,7 @@ public class AddCoinDialog extends MyDialog {
         tvInputScore = getRootView().findViewById(R.id.tv_input_score);
         tvCurrentScore = getRootView().findViewById(R.id.tv_current_score);
         ivAdd = getRootView().findViewById(R.id.iv_add);
+        ivClose = getRootView().findViewById(R.id.iv_close);
         ivSubstrace = getRootView().findViewById(R.id.iv_substract);
         ivCommit = getRootView().findViewById(R.id.iv_ok);
 
@@ -115,6 +116,12 @@ public class AddCoinDialog extends MyDialog {
                 String inputScoreStr = tvInputScore.getText().toString().trim();
                 int inputScore = Integer.parseInt(inputScoreStr);
                 tvInputScore.setText(String.valueOf(inputScore + currentAddScore));
+            }
+        });
+        ivClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
             }
         });
         ivSubstrace.setOnClickListener(new View.OnClickListener() {
@@ -178,6 +185,7 @@ public class AddCoinDialog extends MyDialog {
                 break;
         }
     }
+
     /**
      * 点击事件
      */

@@ -3,6 +3,7 @@ package com.szpcqy.fisher.ui.fish.play;
 import android.content.Context;
 
 import com.szpcqy.fisher.data.login.LoginResponse;
+import com.szpcqy.fisher.data.login.UserVo;
 import com.szpcqy.fisher.data.play.AddCoinRequest;
 import com.szpcqy.fisher.data.play.PlayFishRequest;
 import com.szpcqy.fisher.event.pair.SocketResonse;
@@ -42,8 +43,8 @@ public class FishPlayPresenter extends MvpBasePresenter<FishPlayView> {
                 getView().returnCoinSuccess();
                 break;
             case SocketProtocol.COININ_RES:
-                LoginResponse loginResponse = res.read(LoginResponse.class, res.getData());
-                getView().addCoinSuccess(loginResponse);
+                UserVo userVo = res.read(UserVo.class, res.getData());
+                getView().addCoinSuccess(userVo);
                 break;
             case SocketProtocol.QUIT_SLOT_RES:
                 getView().quitSlotSuccess();

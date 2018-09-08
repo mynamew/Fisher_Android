@@ -3,7 +3,11 @@ package com.szpcqy.fisher.ui.fish.desk;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.jzk.utilslibrary.LogUitls;
 import com.szpcqy.fisher.R;
@@ -13,7 +17,6 @@ import com.szpcqy.fisher.data.fish.FishJoinSlotRequest;
 import com.szpcqy.fisher.data.login.LoginRequest;
 import com.szpcqy.fisher.data.login.LoginResponse;
 import com.szpcqy.fisher.event.pair.NetResponse;
-import com.szpcqy.fisher.event.pair.SocketCloseRequest;
 import com.szpcqy.fisher.event.pair.SocketResonse;
 import com.szpcqy.fisher.event.pair.WifiResponse;
 import com.szpcqy.fisher.mt.MTActivity;
@@ -21,7 +24,6 @@ import com.szpcqy.fisher.mt.MTApplication;
 import com.szpcqy.fisher.mt.MTDialog;
 import com.szpcqy.fisher.mt.MTLightbox;
 import com.szpcqy.fisher.mt.MTMvpActivity;
-import com.szpcqy.fisher.mt.MTWebsocket;
 import com.szpcqy.fisher.net.SocketProtocol;
 import com.szpcqy.fisher.net.vo.GameSLotVO;
 import com.szpcqy.fisher.tool.CacheTool;
@@ -34,8 +36,10 @@ import com.szpcqy.fisher.ui.login.LoginActivity;
 import com.szpcqy.fisher.utils.ActivityUtils;
 import com.szpcqy.fisher.utils.WifiUtils;
 
-import org.greenrobot.eventbus.EventBus;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 
 /**
@@ -48,6 +52,14 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
     static public final String DESKID = "DESKID";
     static public final String DES_TYPE = "DES_TYPE";
     static public final String DES_RELOG = "DES_RELOG";
+    @BindView(R.id.iv_head)
+    CircleImageView ivHead;
+    @BindView(R.id.tv_gold_qty)
+    TextView tvGoldQty;
+    @BindView(R.id.iv_return)
+    ImageView ivReturn;
+    @BindView(R.id.iv_set)
+    ImageView ivSet;
 
     private DeskBaseFragment fragment;
     private MTDialog.MTDialogContent dia;
@@ -63,22 +75,23 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
 
     @Override
     public void initView() {
-
+         ivSet.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void initData() {
+        setTextViewContent(tvGoldQty,CacheTool.getCurentGold());
         fishGetAllDeskResponse = CacheTool.getCurrentFishDesk();
-        boolean isReConnectPlay=getIntent().getBooleanExtra(DES_RELOG,false);
+        boolean isReConnectPlay = getIntent().getBooleanExtra(DES_RELOG, false);
         /**
          * 是否是刚好在Ip
          */
-        if (!WifiUtils.getWifiRouteIPAddress(FishDeskActivity.this).equals(fishGetAllDeskResponse.getServerip())&&!isReConnectPlay) {
+        if (!WifiUtils.getWifiRouteIPAddress(FishDeskActivity.this).equals(fishGetAllDeskResponse.getServerip()) && !isReConnectPlay) {
             /**
              * 自动连接wifi
              */
             autoConnectWifi(fishGetAllDeskResponse.getDevicessid(), fishGetAllDeskResponse.getDevicesspw());
-        }else {
+        } else {
             FishGetAllDeskRequest request = new FishGetAllDeskRequest(SocketProtocol.GET_DESK_SINGLE_REQ, fishGetAllDeskResponse.getId());
             getPresenter().getAllDesk(request);
         }
@@ -257,27 +270,28 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
     @Override
     protected void updateUserInfo(LoginResponse userinfo) {
         super.updateUserInfo(userinfo);
-        // TODO: 2018/9/1 更新用户信息
+        setTextViewContent(tvGoldQty,CacheTool.getCurentGold());
     }
 
     @Override
     public void getSingleDeskFail(String mesg) {
         LogUitls.d("获取桌位失败！");
+        Toasty.warning(this,mesg).show();
     }
 
     @Override
     public void userKickDown(String msg) {
-
+        Toasty.warning(this,msg).show();
     }
 
     @Override
     public void coinOutSuccess(LoginResponse response) {
-
+        CacheTool.setCurrentLoginResponse(response);
     }
 
     @Override
     public void coinOutFail(String msg) {
-
+          Toasty.warning(this,msg).show();
     }
 
     @Override
@@ -312,8 +326,12 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(null!=dia){
+        if (null != dia) {
             dia.close();
         }
+    }
+    @OnClick(R.id.iv_return)
+    public void onViewClicked() {
+        onBackPressed();
     }
 }

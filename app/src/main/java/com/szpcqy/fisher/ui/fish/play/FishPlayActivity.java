@@ -3,16 +3,20 @@ package com.szpcqy.fisher.ui.fish.play;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.jzk.utilslibrary.LogUitls;
 import com.linkcard.media.VideoSurfaceView;
 import com.szpcqy.fisher.R;
 import com.szpcqy.fisher.data.login.LoginResponse;
+import com.szpcqy.fisher.data.login.UserVo;
 import com.szpcqy.fisher.event.pair.SocketRequest;
 import com.szpcqy.fisher.mt.MTDialog;
 import com.szpcqy.fisher.mt.MTLightbox;
@@ -28,6 +32,7 @@ import com.szpcqy.fisher.view.AddCoinDialog;
 import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
 import io.github.controlwear.virtual.joystick.android.JoystickView;
@@ -65,12 +70,22 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     ImageView ivAddGun;
     @BindView(R.id.iv_shoot)
     ImageView ivShoot;
+    @BindView(R.id.ll_content)
+    LinearLayout llContent;
+    @BindView(R.id.ll_bottom)
+    LinearLayout llBottom;
+    @BindView(R.id.cons_top)
+    RelativeLayout consTop;
     /**
      * 左边菜单的属性
      */
     private float fromPosition = 0;
-    private float toPosition = -200;
-    private boolean isShowLeftMenu = false;
+    private float toPosition = 0;
+    private float toTopPosition = 0;
+    private float toBottomPosition = 0;
+    private boolean isShowLeftMenu = true;
+    private boolean isShowTopMenu = true;
+    private boolean isShowBottomMenu = true;
     /**
      * 方向 开炮
      */
@@ -82,7 +97,8 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
 
     private Clock mClockPlay;
     private int deviceType;
-
+    //计时器
+    Clock clockAnima;
     @Override
     public int setLayoutId() {
         return R.layout.activity_fish_play;
@@ -134,24 +150,40 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
             }
             return bol;
         });
-//        int deskType = getIntent().getIntExtra(DESK_TYPE, 0);
-//        int slotCurrentPosition= getIntent().getIntExtra(SLOT_POSITION, 0);
-//        if(deskType==1){
-//            if(slotCurrentPosition==5||slotCurrentPosition==6||slotCurrentPosition==7){
-//                findViewById(R.id.ll_content).setRotation(180);
-//            }
-//        }else {
-//            if(slotCurrentPosition==4||slotCurrentPosition==5){
-//                findViewById(R.id.ll_content).setRotation(180);
-//            }
-//        }
-        findViewById(R.id.ll_bottom).setOnClickListener(new View.OnClickListener() {
+        //动画隐藏上下 左右menu
+        clockAnima = Clock.create(this).interval(500).count(1).onCompleteOnUI(new Runnable() {
             @Override
-            public void onClick(View v) {
-                LogUitls.e("翻转！！！！！");
-                videoPlay.setRotation(180);
+            public void run() {
+                if (isShowLeftMenu) {
+                    toPosition = -llLeftMenu.getWidth() / 3 * 2;
+                    //显示隐藏 加币 退币的界面  平移动画
+                    ObjectAnimator animator = null;
+                    animator = ObjectAnimator.ofFloat(llLeftMenu, "translationX", fromPosition, toPosition);
+                    animator.setDuration(500);
+                    animator.start();
+                    isShowLeftMenu = !isShowLeftMenu;
+                }
+                if (isShowBottomMenu) {
+                    toBottomPosition = llBottom.getHeight() * 2 / 3;
+                    //显示隐藏 加币 退币的界面  平移动画
+                    ObjectAnimator animatorBottom = null;
+                    animatorBottom = ObjectAnimator.ofFloat(llBottom, "translationY", fromPosition, toBottomPosition);
+                    animatorBottom.setDuration(500);
+                    animatorBottom.start();
+                    isShowBottomMenu = !isShowBottomMenu;
+                }
+                if (isShowTopMenu) {
+                    toTopPosition = -consTop.getHeight()  / 3;
+                    //显示隐藏 加币 退币的界面  平移动画
+                    ObjectAnimator animatorTop = null;
+                    animatorTop = ObjectAnimator.ofFloat(consTop, "translationY", fromPosition, toTopPosition);
+                    animatorTop.setDuration(500);
+                    animatorTop.start();
+                    isShowTopMenu = !isShowTopMenu;
+                }
             }
         });
+        clockAnima.start();
     }
 
     @Override
@@ -160,7 +192,8 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
         //分数
         Double ratiocoinscore = super.getIntent().getDoubleExtra(RATIO_COIN_MULTIPLY, 1);
         tvGoldQty.setText(String.valueOf(CacheTool.getCurentGold()));
-        VideoCard.playVideo(videoPlay);
+        String url = "rtsp://" + CacheTool.getCurrentFishDesk().getVideoip() + "/1/h264major";
+        VideoCard.playVideo(videoPlay, url);
         mClockPlay = Clock.create(this).interval(10).count(-1).onCountOnIO(new Runnable() {
             @Override
             public void run() {
@@ -203,21 +236,14 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
 
     @Override
     public void showProgressDialog(int protocol) {
-        switch (protocol) {
-            case SocketProtocol.COININ_REQ:
-                dia = MTLightbox.show(getContext(), MTLightbox.IconType.PROGRESS, "投币中...", false);
-                break;
-            default:
-                break;
-        }
+
     }
 
     @Override
     public void dismisProgressDialog() {
-        dia.close();
     }
 
-    @OnClick({R.id.iv_add_coin, R.id.iv_return_coin, R.id.ll_left_menu, R.id.iv_add_gun})
+    @OnClick({R.id.iv_add_coin, R.id.iv_return_coin, R.id.cons_top, R.id.ll_bottom, R.id.ll_left_menu, R.id.iv_add_gun})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_add_coin:
@@ -226,8 +252,8 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
                 new AddCoinDialog(this, new AddCoinDialog.OnAddCoinListener() {
                     @Override
                     public void commit(int score) {
-                        LogUitls.e("加币---->" + score);
                         if (score > 0) {
+                            dia=MTLightbox.show(FishPlayActivity.this, MTLightbox.IconType.PROGRESS,"正在投币",false,score*200,null);
                             //加币的请求
                             getPresenter().addCoin(score);
                         }
@@ -235,17 +261,15 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
                 }).setCurrentScore(String.valueOf(CacheTool.getCurentGold())).show();
                 break;
             case R.id.iv_return_coin:
-                LogUitls.e("退币");
                 getPresenter().returnCoin();
                 break;
             case R.id.ll_left_menu:
+                toPosition = -llLeftMenu.getWidth() / 3 * 2;
                 //显示隐藏 加币 退币的界面  平移动画
                 ObjectAnimator animator = null;
-                if (!isShowLeftMenu) {
-                    LogUitls.e("左平移");
+                if (isShowLeftMenu) {
                     animator = ObjectAnimator.ofFloat(llLeftMenu, "translationX", fromPosition, toPosition);
                 } else {
-                    LogUitls.e("右平移");
                     animator = ObjectAnimator.ofFloat(llLeftMenu, "translationX", toPosition, fromPosition);
                 }
                 animator.setDuration(500);
@@ -253,20 +277,35 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
                 isShowLeftMenu = !isShowLeftMenu;
                 break;
             case R.id.iv_add_gun:
-//                new RegistDialog(this, new RegistDialog.RegistListener() {
-//                    @Override
-//                    public void commitRegist(String user, String psw, String repeatPsw, String tel, String question, String answer) {
-//                        LogUitls.e("输入的信息--->",
-//                                "\n user--->" + user +
-//                                        "\n psw------>" + psw +
-//                                        "\n repeatpsw---->" + repeatPsw +
-//                                        "\n tel---->" + tel +
-//                                        "\n question----->" + question +
-//                                        "\n answer---->" + answer);
-//                    }
-//                }).show();           //
+      //
                 //切换大炮
                 getPresenter().switchStrength();
+                break;
+            case R.id.cons_top:
+                toTopPosition =-consTop.getHeight() /3;
+                //显示隐藏 加币 退币的界面  平移动画
+                ObjectAnimator animatorTop = null;
+                if (isShowTopMenu) {
+                    animatorTop = ObjectAnimator.ofFloat(consTop, "translationY", fromPosition, toTopPosition);
+                } else {
+                    animatorTop = ObjectAnimator.ofFloat(consTop, "translationY", toTopPosition, fromPosition);
+                }
+                animatorTop.setDuration(500);
+                animatorTop.start();
+                isShowTopMenu = !isShowTopMenu;
+                break;
+            case R.id.ll_bottom:
+                toBottomPosition = llBottom.getHeight()*2/3;
+                //显示隐藏 加币 退币的界面  平移动画
+                ObjectAnimator animatorBottom = null;
+                if (isShowBottomMenu) {
+                    animatorBottom = ObjectAnimator.ofFloat(llBottom, "translationY", fromPosition, toBottomPosition);
+                } else {
+                    animatorBottom = ObjectAnimator.ofFloat(llBottom, "translationY", toBottomPosition, fromPosition);
+                }
+                animatorBottom.setDuration(500);
+                animatorBottom.start();
+                isShowBottomMenu = !isShowBottomMenu;
                 break;
             default:
                 break;
@@ -282,21 +321,23 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     public void finish() {
         super.finish();
         mClockPlay.stop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+        VideoCard.stopVideo();
         if (dia != null) {
             dia.close();
         }
     }
 
     @Override
-    public void addCoinSuccess(LoginResponse loginResponse) {
-        dia.close();
-        CacheTool.setCurrentLoginResponse(loginResponse);
-        tvGoldQty.setText(String.valueOf(loginResponse.getUserVO().getGold()));
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
+
+    @Override
+    public void addCoinSuccess(UserVo userVo) {
+        LoginResponse currentLoginResponse = CacheTool.getCurrentLoginResponse();
+        currentLoginResponse.setUserVO(userVo);
+        CacheTool.setCurrentLoginResponse(currentLoginResponse);
     }
 
     @Override
@@ -339,6 +380,7 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
      */
     @Override
     protected void updateUserInfo(LoginResponse userinfo) {
-        tvGoldQty.setText(String.valueOf(userinfo.getUserVO().getGold()));
+        setTextViewContent(tvGoldQty, CacheTool.getCurentGold());
     }
+
 }

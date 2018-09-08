@@ -1,6 +1,7 @@
 package com.szpcqy.fisher.net.vo;
 
 import com.szpcqy.fisher.data.login.LoginResponse;
+import com.szpcqy.fisher.data.login.UserVo;
 
 import java.io.Serializable;
 
@@ -10,7 +11,7 @@ public class GameSLotVO implements Serializable {
 	private String id;
 	private String com;
 	private int enable;
-	private LoginResponse.UserVOBeanXX userVO;
+	private UserVo userVO;
 
 
 
@@ -38,10 +39,10 @@ public class GameSLotVO implements Serializable {
 	public void setEnable(int enable) {
 		this.enable = enable;
 	}
-	public LoginResponse.UserVOBeanXX getUserVO() {
+	public UserVo getUserVO() {
 		return userVO;
 	}
-	public void setUserVO(LoginResponse.UserVOBeanXX userVO) {
+	public void setUserVO(UserVo userVO) {
 		this.userVO = userVO;
 	}
 

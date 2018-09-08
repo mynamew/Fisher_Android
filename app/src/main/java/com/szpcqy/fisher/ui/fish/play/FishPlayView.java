@@ -1,6 +1,7 @@
 package com.szpcqy.fisher.ui.fish.play;
 
 import com.szpcqy.fisher.data.login.LoginResponse;
+import com.szpcqy.fisher.data.login.UserVo;
 import com.szpcqy.fisher.ui.base.view.iml.MvpBaseView;
 
 /**
@@ -11,9 +12,9 @@ import com.szpcqy.fisher.ui.base.view.iml.MvpBaseView;
 public interface FishPlayView extends MvpBaseView {
     /**
      * 加币成功
-     * @param loginResponse
+     * @param userVo
      */
-    void addCoinSuccess(LoginResponse loginResponse);
+    void addCoinSuccess(UserVo userVo);
 
     /**
      * 退出控制位成功

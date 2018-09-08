@@ -1,1 +1,1 @@
-include ':app',':mvplibrary',':utilslibrary'
+include ':app',':utilslibrary',':imageloader'
