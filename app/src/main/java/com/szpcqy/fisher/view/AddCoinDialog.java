@@ -11,6 +11,8 @@ import com.szpcqy.fisher.R;
 
 import java.util.ArrayList;
 
+import es.dmoral.toasty.Toasty;
+
 
 /**
  * 加币的弹出框
@@ -142,10 +144,16 @@ public class AddCoinDialog extends MyDialog {
             public void onClick(View v) {
                 String inputScoreStr = tvInputScore.getText().toString().trim();
                 int inputScore = Integer.parseInt(inputScoreStr);
+                if(inputScore<=0){
+                    Toasty.warning(getContext(),"加币数量不能小于等于0！").show();
+                    return;
+                }
                 listener.commit(inputScore);
                 AddCoinDialog.this.dismiss();
             }
         });
+        //设置默认选择为1
+        setScoreSelect(0);
         this.setCancelByOutside(true);
     }
 
