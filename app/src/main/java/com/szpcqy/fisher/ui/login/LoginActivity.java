@@ -136,10 +136,10 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
                     Toasty.warning(getContext(), "请前往设置wifi名称").show();
                     return;
                 }
-                if (TextUtils.isEmpty(wifiPsw)) {
-                    Toasty.warning(getContext(), "请前往设置wifi密码").show();
-                    return;
-                }
+//                if (TextUtils.isEmpty(wifiPsw)) {
+//                    Toasty.warning(getContext(), "请前往设置wifi密码").show();
+//                    return;
+//                }
                 //重连wifi
                 EventBus.getDefault().post(new WifiRequest(wifiName, wifiPsw));
                 break;

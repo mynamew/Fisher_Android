@@ -61,10 +61,10 @@ public class ServerSetDialog extends MyDialog {
                     return;
                 }
                 String wifiPsw = etWifiPsw.getText().toString().trim();
-                if (TextUtils.isEmpty(wifiPsw)) {
-                    Toasty.warning(getContext(), "请输入wifi密码").show();
-                    return;
-                }
+//                if (TextUtils.isEmpty(wifiPsw)) {
+//                    Toasty.warning(getContext(), "请输入wifi密码").show();
+//                    return;
+//                }
                 String serverIp = etServerIp.getText().toString().trim();
                 if (TextUtils.isEmpty(serverIp)) {
                     Toasty.warning(getContext(), "请输入serverIp").show();
