@@ -15,8 +15,10 @@
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@mipmap/hall_desk8_disable" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:scaleType="fitXY"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/hall_desk8" />
 
         <!--left-->
         <include
