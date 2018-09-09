@@ -57,8 +57,6 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
     EditText etUsername;
     @BindView(R.id.et_password)
     EditText etPassword;
-    @BindView(R.id.centerCon)
-    LinearLayout centerCon;
     @BindView(R.id.confirmBtn)
     MTImageView confirmBtn;
     @BindView(R.id.tv_forget_psw)

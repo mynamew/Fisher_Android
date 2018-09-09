@@ -64,7 +64,7 @@ public class MTDialog {
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable());
 
         WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
         dialog.getWindow().setGravity(Gravity.CENTER);
         dialog.getWindow().setAttributes(lp);

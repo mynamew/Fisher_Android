@@ -8,7 +8,9 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="470dp"
         android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
         app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/bg_rectangle"
         app:layout_constraintBottom_toBottomOf="parent"
         android:orientation="vertical"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -126,14 +128,13 @@
                 android:layout_height="40dp"
                 android:layout_marginBottom="20dp"
                 android:layout_marginEnd="20dp"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/bg_comnfirm"
                 android:text="提交"
                 android:textColor="#fff"
+                app:layout_constraintLeft_toRightOf="@id/tv_reapeatpsw_tip"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_reapeatpsw_tip"/>
         </android.support.constraint.ConstraintLayout>
 
@@ -141,7 +142,8 @@
             android:id="@+id/iv_close"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginEnd="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
             android:scaleType="centerCrop"
             android:src="@mipmap/iv_server_close"
             app:layout_constraintRight_toRightOf="parent"

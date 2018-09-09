@@ -1,6 +1,7 @@
 package com.szpcqy.fisher.view;
 
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -26,8 +27,9 @@ public class ServerSetDialog extends MyDialog {
 
     public ServerSetDialog(Context context) {
         super(context, R.layout.dialog_set_server);
+        getWindow().setBackgroundDrawable(new ColorDrawable());
         WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
         getWindow().setGravity(Gravity.CENTER);
         getWindow().setAttributes(lp);

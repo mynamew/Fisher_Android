@@ -32,7 +32,7 @@ public class AddCoinDialog extends MyDialog {
     public AddCoinDialog(Context context, OnAddCoinListener listener) {
         super(context, R.layout.dialog_add_coin);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
         getWindow().setGravity(Gravity.CENTER);
         getWindow().setAttributes(lp);
