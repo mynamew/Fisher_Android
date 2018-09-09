@@ -133,4 +133,13 @@
         android:src="@mipmap/play_shoot"
         custom:layout_constraintBottom_toBottomOf="parent"
         custom:layout_constraintRight_toRightOf="parent"/>
+    <ImageView
+        android:id="@+id/iv_return"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginRight="7dp"
+        android:layout_marginTop="5dp"
+        android:src="@mipmap/login_return"
+        custom:layout_constraintRight_toRightOf="parent"
+        custom:layout_constraintTop_toTopOf="parent"/>
 </android.support.constraint.ConstraintLayout>

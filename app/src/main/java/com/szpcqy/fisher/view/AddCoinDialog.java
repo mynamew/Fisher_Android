@@ -192,6 +192,7 @@ public class AddCoinDialog extends MyDialog {
             default:
                 break;
         }
+        tvInputScore.setText(String.valueOf(currentAddScore));
     }
 
     /**

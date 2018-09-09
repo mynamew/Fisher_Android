@@ -3,8 +3,6 @@ package com.szpcqy.fisher.ui.fish.play;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -32,7 +30,6 @@ import com.szpcqy.fisher.view.AddCoinDialog;
 import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
 import io.github.controlwear.virtual.joystick.android.JoystickView;
@@ -99,6 +96,7 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     private int deviceType;
     //计时器
     Clock clockAnima;
+
     @Override
     public int setLayoutId() {
         return R.layout.activity_fish_play;
@@ -173,7 +171,7 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
                     isShowBottomMenu = !isShowBottomMenu;
                 }
                 if (isShowTopMenu) {
-                    toTopPosition = -consTop.getHeight()  / 3;
+                    toTopPosition = -consTop.getHeight() / 3;
                     //显示隐藏 加币 退币的界面  平移动画
                     ObjectAnimator animatorTop = null;
                     animatorTop = ObjectAnimator.ofFloat(consTop, "translationY", fromPosition, toTopPosition);
@@ -243,7 +241,7 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     public void dismisProgressDialog() {
     }
 
-    @OnClick({R.id.iv_add_coin, R.id.iv_return_coin, R.id.cons_top, R.id.ll_bottom, R.id.ll_left_menu, R.id.iv_add_gun})
+    @OnClick({R.id.iv_return, R.id.iv_add_coin, R.id.iv_return_coin, R.id.cons_top, R.id.ll_bottom, R.id.ll_left_menu, R.id.iv_add_gun})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_add_coin:
@@ -253,7 +251,7 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
                     @Override
                     public void commit(int score) {
                         if (score > 0) {
-                            dia=MTLightbox.show(FishPlayActivity.this, MTLightbox.IconType.PROGRESS,"正在投币",false,score*200,null);
+                            dia = MTLightbox.show(FishPlayActivity.this, MTLightbox.IconType.PROGRESS, "正在投币", false, score * 200, null);
                             //加币的请求
                             getPresenter().addCoin(score);
                         }
@@ -277,12 +275,12 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
                 isShowLeftMenu = !isShowLeftMenu;
                 break;
             case R.id.iv_add_gun:
-      //
+                //
                 //切换大炮
                 getPresenter().switchStrength();
                 break;
             case R.id.cons_top:
-                toTopPosition =-consTop.getHeight() /3;
+                toTopPosition = -consTop.getHeight() / 3;
                 //显示隐藏 加币 退币的界面  平移动画
                 ObjectAnimator animatorTop = null;
                 if (isShowTopMenu) {
@@ -295,7 +293,7 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
                 isShowTopMenu = !isShowTopMenu;
                 break;
             case R.id.ll_bottom:
-                toBottomPosition = llBottom.getHeight()*2/3;
+                toBottomPosition = llBottom.getHeight() * 2 / 3;
                 //显示隐藏 加币 退币的界面  平移动画
                 ObjectAnimator animatorBottom = null;
                 if (isShowBottomMenu) {
@@ -307,6 +305,10 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
                 animatorBottom.start();
                 isShowBottomMenu = !isShowBottomMenu;
                 break;
+            case R.id.iv_return:
+                onBackPressed();
+                break;
+
             default:
                 break;
         }
@@ -320,7 +322,7 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     @Override
     public void finish() {
         super.finish();
-        if(null!=mClockPlay){
+        if (null != mClockPlay) {
             mClockPlay.stop();
         }
         VideoCard.stopVideo();
@@ -333,6 +335,7 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     protected void onDestroy() {
         super.onDestroy();
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -340,6 +343,7 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
             dia.close();
         }
     }
+
     @Override
     public void addCoinSuccess(UserVo userVo) {
         LoginResponse currentLoginResponse = CacheTool.getCurrentLoginResponse();

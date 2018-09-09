@@ -49,7 +49,7 @@ public class GameSelectActivity extends MTActivity {
 
     @Override
     public void initView() {
-
+      ivSet.setVisibility(View.INVISIBLE);
     }
 
     @Override

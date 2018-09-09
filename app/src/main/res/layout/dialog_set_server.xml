@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="470dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="vertical"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/cons_content"
+            android:layout_width="455dp"
+            android:layout_height="232dp"
+            android:layout_marginTop="10dp"
+            android:background="#fff"
+            app:layout_constraintTop_toTopOf="parent">
+            <View
+                android:layout_width="140dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="21dp"
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="#333"/>
+            <TextView
+                android:background="#fff"
+                android:id="@+id/tv_title"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_width="60dp"
+                android:layout_height="44dp"
+                android:gravity="center"
+                android:text="设置"
+                android:textColor="#333"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <TextView
+                android:id="@+id/tv_username_tip"
+                android:layout_width="80dp"
+                android:layout_height="31dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="Wifi名称"
+                android:textColor="#666"
+                app:layout_constraintRight_toRightOf="@id/tv_reapeatpsw_tip"
+
+                app:layout_constraintTop_toBottomOf="@id/tv_title"/>
+
+
+            <TextView
+                android:id="@+id/tv_psw_tip"
+                android:layout_width="80dp"
+                android:layout_height="31dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="Wifi密码"
+                android:textColor="#666"
+                app:layout_constraintRight_toRightOf="@id/tv_reapeatpsw_tip"
+                app:layout_constraintTop_toBottomOf="@id/tv_username_tip"/>
+
+            <TextView
+                android:id="@+id/tv_reapeatpsw_tip"
+                android:layout_width="80dp"
+                android:layout_height="31dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="服务地址"
+                android:textColor="#666"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_psw_tip"/>
+
+            <LinearLayout
+                android:layout_width="284dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                app:layout_constraintLeft_toRightOf="@id/tv_username_tip"
+                app:layout_constraintTop_toBottomOf="@id/tv_title">
+
+                <EditText
+                    android:id="@+id/et_wifi_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="31dp"
+                    android:background="@drawable/selector_et"
+                    android:hint="请输入Wifi名称"
+                    android:paddingLeft="10dp"
+                    android:textColor="#666"
+                    android:textSize="12sp"/>
+
+                <EditText
+                    android:id="@+id/et_wifi_psw"
+                    android:layout_width="match_parent"
+                    android:layout_height="31dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/selector_et"
+                    android:hint="请输入Wifi密码"
+                    android:paddingLeft="10dp"
+                    android:textColor="#666"
+                    android:textSize="12sp"/>
+
+                <EditText
+                    android:id="@+id/et_server_ip"
+                    android:layout_width="match_parent"
+                    android:layout_height="31dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/selector_et"
+                    android:hint="请输入服务地址"
+                    android:paddingLeft="10dp"
+                    android:textColor="#666"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_confirm"
+                android:layout_width="284dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_comnfirm"
+                android:text="提交"
+                android:textColor="#fff"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_reapeatpsw_tip"/>
+        </android.support.constraint.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/iv_close"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="5dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/iv_server_close"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+    </android.support.constraint.ConstraintLayout>
+
+
+</android.support.constraint.ConstraintLayout>

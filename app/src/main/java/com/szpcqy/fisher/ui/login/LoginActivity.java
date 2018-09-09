@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jzk.utilslibrary.LogUitls;
+import com.jzk.utilslibrary.SpUtils;
 import com.szpcqy.fisher.R;
 import com.szpcqy.fisher.data.fish.FishGetAllDeskResponse;
 import com.szpcqy.fisher.data.fish.FishJoinSlotRequest;
@@ -31,6 +32,7 @@ import com.szpcqy.fisher.utils.ToastUtils;
 import com.szpcqy.fisher.utils.WifiUtils;
 import com.szpcqy.fisher.view.MTImageView;
 import com.szpcqy.fisher.view.RegistDialog;
+import com.szpcqy.fisher.view.ServerSetDialog;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -92,8 +94,6 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
     @Override
     protected void onStart() {
         super.onStart();
-        //重连wifi
-        EventBus.getDefault().post(new WifiRequest(Gateway.SERVER_SSID, Gateway.SERVER_SSPW));
     }
 
     @Override
@@ -129,22 +129,21 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
                 onBackPressed();
                 break;
             case R.id.iv_set:
+                new ServerSetDialog(this).show();
                 break;
             case R.id.confirmBtn:
-                String userName = etUsername.getText().toString().trim();
-                if (TextUtils.isEmpty(userName)) {
-                    ToastUtils.showShort(LoginActivity.this, "请输入登录名称");
+                String wifiName = SpUtils.getInstance().getString(this, Gateway.SERVER_SSID);
+                String wifiPsw = SpUtils.getInstance().getString(this, Gateway.SERVER_SSPW);
+                if (TextUtils.isEmpty(wifiName)) {
+                    Toasty.warning(getContext(), "请前往设置wifi名称").show();
                     return;
                 }
-                String passWord = etPassword.getText().toString().trim();
-                if (TextUtils.isEmpty(passWord)) {
-                    ToastUtils.showShort(LoginActivity.this, "请输入登录密码");
+                if (TextUtils.isEmpty(wifiPsw)) {
+                    Toasty.warning(getContext(), "请前往设置wifi密码").show();
                     return;
                 }
-                /**
-                 * 登录的请求
-                 */
-                getPresenter().login(new LoginRequest(SocketProtocol.LOGIN_REQ, userName, passWord));
+                //重连wifi
+                EventBus.getDefault().post(new WifiRequest(wifiName, wifiPsw));
                 break;
             case R.id.tv_forget_psw:
                 break;
@@ -152,7 +151,6 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
                 new RegistDialog(this, new RegistDialog.RegistListener() {
                     @Override
                     public void commitRegist(String user, String psw, String repeatPsw, String tel, String question, String answer) {
-                        // TODO: 2018/9/1 注册的事件
                     }
                 }).show();
                 break;
@@ -305,7 +303,13 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
                 && res.getSsid().equals(CacheTool.getCurrentLoginResponse().getDeviceVO().getDevicessid())) {
             autoConnectSocket(CacheTool.getCurrentLoginResponse().getDeviceVO().getServerip());
         } else {
-            autoConnectSocket(Gateway.SERVER_IP);
+            String serverIp = SpUtils.getInstance().getString(this, Gateway.SERVER_IP);
+
+            if (TextUtils.isEmpty(serverIp)) {
+                Toasty.warning(getContext(), "请前往设置serverIp").show();
+                return;
+            }
+            autoConnectSocket(serverIp);
         }
     }
 
@@ -313,20 +317,25 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
     protected void connectSocketSuccess(NetResponse res) {
         super.connectSocketSuccess(res);
         if (res.getIsConnected()) {
-            if (res.getIp().equals(Gateway.SERVER_IP) && null == CacheTool.getCurrentLoginResponse()) {
-                confirmBtn.setEnabled(true);
-            } else {
-                /**
-                 * 当设备信息不为空为重连
-                 */
-                if (null != CacheTool.getCurrentLoginResponse().getDeviceVO()) {
-                    /**
-                     * 登录的请求
-                     */
-                    getPresenter().login(new LoginRequest(SocketProtocol.LOGIN_REQ, etUsername.getText().toString().trim()
-                            , etPassword.getText().toString().trim()));
-                }
+            /**
+             * 登录的请求
+             */
+            String userName = etUsername.getText().toString().trim();
+            if (TextUtils.isEmpty(userName)) {
+                ToastUtils.showShort(LoginActivity.this, "请输入登录名称");
+                return;
             }
+            String passWord = etPassword.getText().toString().trim();
+            if (TextUtils.isEmpty(passWord)) {
+                ToastUtils.showShort(LoginActivity.this, "请输入登录密码");
+                return;
+            }
+            /**
+             * 登录的请求
+             */
+            getPresenter().login(new LoginRequest(SocketProtocol.LOGIN_REQ, userName, passWord));
+
         }
     }
 }
+
