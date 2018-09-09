@@ -71,6 +71,8 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
     MTImageView leftImg;
     @BindView(R.id.rightImg)
     MTImageView rightImg;
+    @BindView(R.id.tv_username)
+    TextView tvUsername;
 
 
     private ArrayList<DeskBaseFragment> mDeskFragments;
@@ -96,7 +98,13 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
             dia.close();
         }
     }
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (dia != null) {
+            dia.close();
+        }
+    }
     @Override
     protected void connectSocketSuccess(NetResponse res) {
         super.connectSocketSuccess(res);
@@ -132,7 +140,9 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
     public void initData() {
         getPresenter().getAllDesk();
         //设置当前的金币数
-        setTextViewContent(tvGoldQty,CacheTool.getCurentGold());
+        setTextViewContent(tvUsername, CacheTool.getCurentUsername());
+        //设置当前的金币数
+        setTextViewContent(tvGoldQty, CacheTool.getCurentGold());
         mFishDesks = new ArrayList<>();
         mDeskFragments = new ArrayList<>();
 
@@ -184,6 +194,8 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
         LogUitls.d("获取到的桌位信息 FishHall-->" + mDatas);
         mFishDesks.clear();
         mFishDesks.addAll(mDatas);
+        int curPost = mFishDesks.size() == 0 ? 0 : 1;
+        tvCurrentDesk.setText(curPost + " / " + mFishDesks.size());
         updateDesks(null);
     }
 
@@ -227,7 +239,7 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
     public void coinOutSuccess(LoginResponse response) {
         CacheTool.setCurrentLoginResponse(response);
         //设置当前的金币数
-        setTextViewContent(tvGoldQty,CacheTool.getCurentGold());
+        setTextViewContent(tvGoldQty, CacheTool.getCurentGold());
     }
 
     @Override
@@ -285,7 +297,7 @@ public class FishHallActivity extends MTMvpActivity<FishHallView, FishHallPresen
     protected void updateUserInfo(LoginResponse userinfo) {
         super.updateUserInfo(userinfo);
         //设置当前的金币数
-        setTextViewContent(tvGoldQty,CacheTool.getCurentGold());
+        setTextViewContent(tvGoldQty, CacheTool.getCurentGold());
     }
 
     @OnClick({R.id.iv_return, R.id.leftImg, R.id.rightImg})

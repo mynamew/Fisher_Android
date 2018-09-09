@@ -1,6 +1,7 @@
 package com.szpcqy.fisher.ui.game;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -10,9 +11,9 @@ import com.szpcqy.fisher.event.pair.SocketResonse;
 import com.szpcqy.fisher.mt.MTActivity;
 import com.szpcqy.fisher.tool.CacheTool;
 import com.szpcqy.fisher.ui.fish.FishHallActivity;
-import com.szpcqy.fisher.view.AddCoinDialog;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -38,6 +39,8 @@ public class GameSelectActivity extends MTActivity {
     ImageView ivFish;
     @BindView(R.id.iv_relax)
     ImageView ivRelax;
+    @BindView(R.id.tv_username)
+    TextView tvUsername;
 
     @Override
     public int setLayoutId() {
@@ -52,7 +55,8 @@ public class GameSelectActivity extends MTActivity {
     @Override
     public void initData() {
         //设置当前的金币数
-        setTextViewContent(tvGoldQty,CacheTool.getCurentGold());
+        setTextViewContent(tvGoldQty, CacheTool.getCurentGold());
+        setTextViewContent(tvUsername, CacheTool.getCurentUsername());
     }
 
     @Override
@@ -94,4 +98,5 @@ public class GameSelectActivity extends MTActivity {
                 break;
         }
     }
+
 }

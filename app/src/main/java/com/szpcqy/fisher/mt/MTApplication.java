@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
+import com.jzk.utilslibrary.LogUitls;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
@@ -63,9 +64,11 @@ public class MTApplication extends MultiDexApplication {
     }
 
     public void onFinishAllActivities() {
+        LogUitls.e("activity栈  开始----->",_activityList.size());
         while(_activityList.size()>0){
-            _activityList.remove(0).finish();;
+            _activityList.remove(0).finish();
         }
+        LogUitls.e("activity栈  结束----->",_activityList.size());
     }
 
     public boolean isValid(MTActivity atx){

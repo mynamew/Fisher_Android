@@ -26,6 +26,7 @@
 
     <!--底部的桌位信息-->
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/cons_bottom"
         android:layout_width="400dp"
         android:layout_height="100dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -194,10 +195,10 @@
         android:id="@+id/tv_current_desk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text=""
+        android:text="0/0"
         android:textColor="#f9c967"
-        android:textSize="30sp"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@id/cons_bottom"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 

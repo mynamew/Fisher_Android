@@ -85,7 +85,6 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
 
     @Override
     public void initData() {
-        LogUitls.e("当前的ip--->", WifiUtils.getWifiRouteIPAddress(this));
 
     }
 
@@ -110,6 +109,14 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (dia != null) {
+            dia.close();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
         if (dia != null) {
             dia.close();
         }

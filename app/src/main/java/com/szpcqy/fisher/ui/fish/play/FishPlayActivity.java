@@ -320,7 +320,9 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     @Override
     public void finish() {
         super.finish();
-        mClockPlay.stop();
+        if(null!=mClockPlay){
+            mClockPlay.stop();
+        }
         VideoCard.stopVideo();
         if (dia != null) {
             dia.close();
@@ -330,9 +332,14 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
     }
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (dia != null) {
+            dia.close();
+        }
+    }
     @Override
     public void addCoinSuccess(UserVo userVo) {
         LoginResponse currentLoginResponse = CacheTool.getCurrentLoginResponse();
@@ -382,5 +389,4 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     protected void updateUserInfo(LoginResponse userinfo) {
         setTextViewContent(tvGoldQty, CacheTool.getCurentGold());
     }
-
 }

@@ -1,6 +1,5 @@
 package com.szpcqy.fisher.mt;
 
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +14,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.szpcqy.fisher.R;
 import com.szpcqy.fisher.data.login.LoginResponse;
 import com.szpcqy.fisher.event.pair.NetRequest;
 import com.szpcqy.fisher.event.pair.NetResponse;
@@ -24,6 +24,8 @@ import com.szpcqy.fisher.event.pair.WifiResponse;
 import com.szpcqy.fisher.tool.CacheTool;
 import com.szpcqy.fisher.tool.Clock;
 import com.szpcqy.fisher.ui.login.LoginActivity;
+import com.szpcqy.fisher.utils.ActivityUtils;
+import com.szpcqy.fisher.view.MyDialog;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -33,11 +35,12 @@ import butterknife.ButterKnife;
 
 import static com.szpcqy.fisher.net.SocketProtocol.KICK_OUT_RES;
 
-/** 
-  * MTActivity
-  * @author   jzk
-  * create at: 2018/9/5 22:12
-  */  
+/**
+ * MTActivity
+ *
+ * @author jzk
+ * create at: 2018/9/5 22:12
+ */
 
 public abstract class MTActivity extends AppCompatActivity {
 
@@ -74,6 +77,14 @@ public abstract class MTActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (null != dialogKickDowm) {
+            dialogKickDowm.dismiss();
+        }
     }
 
     @Override
@@ -144,21 +155,28 @@ public abstract class MTActivity extends AppCompatActivity {
         /**
          * 设备断开
          */
-        else if(!res.getIsConnected()&&res.getIsRemote()){
-            //被远程关闭，退出登录
-            final AppCompatActivity atx = MTApplication.getInstance().getCurrentActivity();
-            android.app.AlertDialog.Builder bd = new android.app.AlertDialog.Builder(atx);
-            bd.setTitle("警告");
-            bd.setMessage("您与设备之间已失联，将退出到登录界面!");
-            bd.setCancelable(false);
-            bd.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    MTApplication.getInstance().onFinishAllActivities();
-                    atx.startActivity(new Intent(atx, LoginActivity.class));
+        else if (!res.getIsConnected() && res.getIsRemote()) {
+            /**
+             * 是否在前台
+             */
+            if (ActivityUtils.isForeground(this)) {
+                if(null==dialogKickDowm||!dialogKickDowm.isShowing()){
+                    //被远程关闭，退出登录
+                    final AppCompatActivity atx = MTApplication.getInstance().getCurrentActivity();
+                    android.app.AlertDialog.Builder bd = new android.app.AlertDialog.Builder(atx);
+                    bd.setTitle("警告");
+                    bd.setMessage("您与设备之间已失联，将退出到登录界面!");
+                    bd.setCancelable(false);
+                    bd.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            MTApplication.getInstance().onFinishAllActivities();
+                            atx.startActivity(new Intent(atx, LoginActivity.class));
+                        }
+                    });
+                    bd.show();
                 }
-            });
-            bd.show();
+            }
         }
     }
 
@@ -170,6 +188,8 @@ public abstract class MTActivity extends AppCompatActivity {
     protected void connectSocketSuccess(NetResponse res) {
 
     }
+
+    public MyDialog dialogKickDowm = null;
 
     /**
      * 注册监听Socket发送的事件
@@ -184,21 +204,41 @@ public abstract class MTActivity extends AppCompatActivity {
         if (res.getProtocol() == KICK_OUT_RES) {
             //如果在登录界面不作处理
             if (!(MTApplication.getInstance().getCurrentActivity() instanceof LoginActivity)) {
-                AlertDialog.Builder bd = new AlertDialog.Builder(getContext());
-                bd.setTitle("警告");
-                bd.setMessage(res.getMsg() + ",您将返回登录页面!");
-                bd.setCancelable(false);
-                bd.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //清空登录信息
-                        CacheTool.setCurrentLoginResponse(null);
-                        //跳转
-                        MTApplication.getInstance().onFinishAllActivities();
-                        getContext().startActivity(new Intent(getContext(), LoginActivity.class));
+                /**
+                 * 是否在前台
+                 */
+                if (ActivityUtils.isForeground(this)) {
+                    if(null == dialogKickDowm ){
+                        dialogKickDowm = new MyDialog(getContext(), R.layout.dialog_error_tip);
+                        dialogKickDowm.setTextViewContent(R.id.tv_title, "警告");
+                        dialogKickDowm.setTextViewContent(R.id.tv_content, res.getMsg() + ",您将返回登录页面!");
+                        dialogKickDowm.setButtonListener(R.id.btn_cancel, "去登录", new MyDialog.DialogClickListener() {
+                            @Override
+                            public void dialogClick(MyDialog dialog) {
+                                dialog.dismiss();
+                                //清空登录信息
+                                CacheTool.setCurrentLoginResponse(null);
+                                getContext().startActivity(new Intent(getContext(), LoginActivity.class));
+                                //清除activity
+                                MTApplication.getInstance().onFinishAllActivities();
+                            }
+                        });
+                        dialogKickDowm.setImageViewListener(R.id.iv_close, new MyDialog.DialogClickListener() {
+                            @Override
+                            public void dialogClick(MyDialog dialog) {
+                                dialog.dismiss();
+                                //清空登录信息
+                                CacheTool.setCurrentLoginResponse(null);
+                                getContext().startActivity(new Intent(getContext(), LoginActivity.class));
+                                //清除activity
+                                MTApplication.getInstance().onFinishAllActivities();
+                            }
+                        });
                     }
-                });
-                bd.show();
+                    dialogKickDowm.setTextViewContent(R.id.tv_title, "警告");
+                    dialogKickDowm.setTextViewContent(R.id.tv_content, res.getMsg() + ",您将返回登录页面!");
+                    dialogKickDowm.show();
+                }
             }
             return;
         }

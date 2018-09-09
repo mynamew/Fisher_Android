@@ -60,6 +60,8 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
     ImageView ivReturn;
     @BindView(R.id.iv_set)
     ImageView ivSet;
+    @BindView(R.id.tv_username)
+    TextView tvUsername;
 
     private DeskBaseFragment fragment;
     private MTDialog.MTDialogContent dia;
@@ -75,12 +77,14 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
 
     @Override
     public void initView() {
-         ivSet.setVisibility(View.INVISIBLE);
+        ivSet.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void initData() {
-        setTextViewContent(tvGoldQty,CacheTool.getCurentGold());
+        setTextViewContent(tvGoldQty, CacheTool.getCurentGold());
+        //设置当前的金币数
+        setTextViewContent(tvUsername, CacheTool.getCurentUsername());
         fishGetAllDeskResponse = CacheTool.getCurrentFishDesk();
         boolean isReConnectPlay = getIntent().getBooleanExtra(DES_RELOG, false);
         /**
@@ -270,18 +274,18 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
     @Override
     protected void updateUserInfo(LoginResponse userinfo) {
         super.updateUserInfo(userinfo);
-        setTextViewContent(tvGoldQty,CacheTool.getCurentGold());
+        setTextViewContent(tvGoldQty, CacheTool.getCurentGold());
     }
 
     @Override
     public void getSingleDeskFail(String mesg) {
         LogUitls.d("获取桌位失败！");
-        Toasty.warning(this,mesg).show();
+        Toasty.warning(this, mesg).show();
     }
 
     @Override
     public void userKickDown(String msg) {
-        Toasty.warning(this,msg).show();
+        Toasty.warning(this, msg).show();
     }
 
     @Override
@@ -291,7 +295,7 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
 
     @Override
     public void coinOutFail(String msg) {
-          Toasty.warning(this,msg).show();
+        Toasty.warning(this, msg).show();
     }
 
     @Override
@@ -327,6 +331,13 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
     protected void onDestroy() {
         super.onDestroy();
         if (null != dia) {
+            dia.close();
+        }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (dia != null) {
             dia.close();
         }
     }
