@@ -311,20 +311,10 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
 
     @Override
     public void onBackPressed() {
+        dia = MTLightbox.show(FishPlayActivity.this, MTLightbox.IconType.PROGRESS, "正在退出", false);
         getPresenter().quitSlot();
     }
 
-    @Override
-    public void finish() {
-        super.finish();
-        if (null != mClockPlay) {
-            mClockPlay.stop();
-        }
-        VideoCard.stopVideo();
-        if (dia != null) {
-            dia.close();
-        }
-    }
 
     @Override
     protected void onDestroy() {
@@ -335,7 +325,7 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     protected void onRestart() {
         super.onRestart();
         String url = "rtsp://" + CacheTool.getCurrentFishDesk().getVideoip() + "/1/h264major";
-        VideoCard.reStartPlay(videoPlay,url);
+        VideoCard.reStartPlay(videoPlay, url);
         if (null != mClockPlay) {
             mClockPlay.start();
         }
@@ -363,6 +353,7 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
 
     @Override
     public void quitSlotSuccess() {
+        dia.close();
         Toasty.success(getApplicationContext(), "您已退出游戏，若有分数未退，系统将自动退还到您的账户").show();
         /**
          * 如果Activity栈中有桌位的Activity即FishDeskActivity 则直接返回否则执行跳转操作

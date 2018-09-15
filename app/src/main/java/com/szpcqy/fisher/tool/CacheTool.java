@@ -48,7 +48,10 @@ public class CacheTool {
      * @return
      */
     static public int getCurentGold() {
-        return response.getUserVO().getGold();
+        if(null!=response&&null!=response.getUserVO()){
+            return response.getUserVO().getGold();
+        }
+        return 0;
     }
 
     /**
@@ -57,7 +60,10 @@ public class CacheTool {
      * @return
      */
     static public String getCurentUsername() {
-        return response.getUserVO().getLoginname();
+        if(null!=response&&null!=response.getUserVO()){
+            return response.getUserVO().getLoginname();
+        }
+        return "";
     }
 
     /**
