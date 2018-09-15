@@ -307,7 +307,6 @@ public class FishDeskActivity extends MTMvpActivity<FishDeskView, FishDeskPresen
     public void joinSlotSuccess(SocketResonse res) {
         MTLightbox.update(getContext(), dia, MTLightbox.IconType.SUCCESS, "加入座位成功", 1000);
         Intent it = new Intent(getContext(), FishPlayActivity.class);
-        it.putExtra(FishPlayActivity.RATIO_COIN_MULTIPLY, fishGetAllDeskResponse.getRatiocoinscore());
         it.putExtra(FishPlayActivity.SLOT_POSITION, currentSlotSelectPosition);
         it.putExtra(FishPlayActivity.DESK_TYPE, fishGetAllDeskResponse.getDevicetype());
         startActivity(it);

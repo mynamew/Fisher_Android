@@ -45,4 +45,13 @@ public class LoginResponse {
     public void setSlotVO(GameSLotVO slotVO) {
         this.slotVO = slotVO;
     }
+
+    @Override
+    public String toString() {
+        return "LoginResponse{" +
+                "deviceVO=" + deviceVO +
+                ", slotVO=" + slotVO +
+                ", userVO=" + userVO +
+                '}';
+    }
 }

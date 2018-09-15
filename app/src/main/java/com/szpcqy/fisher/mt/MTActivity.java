@@ -311,7 +311,7 @@ public abstract class MTActivity extends AppCompatActivity {
         }
         //为空 什么都不填
         else if (null == object) {
-
+            tv.setText("");
         } else {
             content = String.valueOf(object);
         }

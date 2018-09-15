@@ -119,4 +119,21 @@ public class UserVo {
     public void setLoginStatus(int loginStatus) {
         this.loginStatus = loginStatus;
     }
+
+    @Override
+    public String toString() {
+        return "UserVo{" +
+                "id='" + id + '\'' +
+                ", loginname='" + loginname + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", password='" + password + '\'' +
+                ", iconimg='" + iconimg + '\'' +
+                ", gold=" + gold +
+                ", adminid='" + adminid + '\'' +
+                ", gender=" + gender +
+                ", frozen=" + frozen +
+                ", createdate='" + createdate + '\'' +
+                ", loginStatus=" + loginStatus +
+                '}';
+    }
 }

@@ -45,8 +45,6 @@ import static com.szpcqy.fisher.ui.fish.desk.FishDeskActivity.DES_TYPE;
  * create at: 2018/8/27 17:26
  */
 public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresenter> implements FishPlayView {
-    //金币数
-    static public final String RATIO_COIN_MULTIPLY = "RATIO_COIN_MULTIPLY";
     //位置的bundle
     static public final String SLOT_POSITION = "SLOT_POSITION";
     //桌子的类型 8还是6
@@ -186,9 +184,6 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
 
     @Override
     public void initData() {
-        deviceType = getIntent().getIntExtra(DES_TYPE, 1);
-        //分数
-        Double ratiocoinscore = super.getIntent().getDoubleExtra(RATIO_COIN_MULTIPLY, 1);
         tvGoldQty.setText(String.valueOf(CacheTool.getCurentGold()));
         String url = "rtsp://" + CacheTool.getCurrentFishDesk().getVideoip() + "/1/h264major";
         VideoCard.playVideo(videoPlay, url);
@@ -337,11 +332,26 @@ public class FishPlayActivity extends MTMvpActivity<FishPlayView, FishPlayPresen
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        String url = "rtsp://" + CacheTool.getCurrentFishDesk().getVideoip() + "/1/h264major";
+        VideoCard.reStartPlay(videoPlay,url);
+        if (null != mClockPlay) {
+            mClockPlay.start();
+        }
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         if (dia != null) {
             dia.close();
         }
+        if (null != mClockPlay) {
+            mClockPlay.stop();
+        }
+        VideoCard.stopVideo();
+
     }
 
     @Override
