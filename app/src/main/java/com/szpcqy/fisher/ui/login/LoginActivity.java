@@ -262,7 +262,6 @@ public class LoginActivity extends MTMvpActivity<LoginView, LoginPresenter> impl
         if (null != deviceVO && deviceVO.getSlot8().equals(userId)) {
             currentSlotSelectPosition = 8;
         }
-        it.putExtra(FishPlayActivity.RATIO_COIN_MULTIPLY, deviceVO.getRatiocoinscore());
         it.putExtra(FishPlayActivity.SLOT_POSITION, currentSlotSelectPosition);
         it.putExtra(FishDeskActivity.DESKID, deviceVO.getId());
         it.putExtra(FishPlayActivity.DESK_TYPE, deviceVO.getDevicetype());
